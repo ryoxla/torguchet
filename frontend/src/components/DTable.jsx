@@ -1,0 +1,4 @@
+function DTable({headers,rows,alignRight=[]}){
+  return <div style={{overflowX:"auto"}}><table><thead><tr style={{borderBottom:`1px solid ${C.border}`}}>{headers.map((h,i)=><th key={i} style={{padding:"10px 14px",textAlign:alignRight.includes(i)?"right":"left",color:C.textMuted,fontSize:11,fontWeight:600,letterSpacing:"0.05em",textTransform:"uppercase",whiteSpace:"nowrap"}}>{h}</th>)}</tr></thead><tbody>{rows.map((row,ri)=><tr key={ri} style={{borderBottom:`1px solid ${C.border}`,transition:"background 0.1s"}} onMouseEnter={e=>e.currentTarget.style.background=C.surfaceHover} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>{row.map((cell,ci)=><td key={ci} style={{padding:"11px 14px",color:C.text,fontSize:13,textAlign:alignRight.includes(ci)?"right":"left"}}>{cell}</td>)}</tr>)}</tbody></table></div>;
+}
+

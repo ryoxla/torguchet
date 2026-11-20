@@ -1,0 +1,302 @@
+import { useState, useEffect } from "react";
+import { C, fmt, fmtDate, api, inDateRange, DateFilter,
+  PURCHASES, ConfirmDialog, fmtQty } from "../utils/globals";
+
+function PurchaseList({ onNav, onOpen, refreshKey = 0 }) {
+  const [purchases, setPurchases] = useState(PURCHASES);
+  const [confirm,   setConfirm]   = useState(null);
+  const [expanded,  setExpanded]  = useState({});   // { id: true/false }
+  const [details,   setDetails]   = useState({});   // { id: lines[] }
+  const [loadingId, setLoadingId] = useState(null);
+  const [allExpanded, setAllExpanded] = useState(false);
+
+  useEffect(() => {
+    api('/orders-purchase').then(rows => {
+      setPurchases(rows.map(r => ({
+        id:           r.id,
+        number:       r.number,
+        date:         fmtDate(r.created_at),
+        counterparty: r.counterparty_name || '—',
+        warehouse:    r.warehouse_name    || '—',
+        amount:       Number(r.total_amount) || 0,
+        paid:         0,
+        qty:          Number(r.total_qty)    || 0,
+        status:       r.status,
+        note:         r.note || '',
+      })));
+    }).catch(() => {});
+  }, [refreshKey]);
+
+  const _td  = new Date();
+  const _fmt = d => `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`;
+  const _today = _fmt(_td);
+  const _ss = k => sessionStorage.getItem('purchaseList_'+k);
+  const [dateFrom, setDateFrom] = useState(_ss('dateFrom') || _today);
+  const [dateTo,   setDateTo]   = useState(_ss('dateTo')   || _today);
+  const [cpSearch, setCpSearch] = useState(_ss('cpSearch') || "");
+  const [sortCol,  setSortCol]  = useState(_ss('sortCol')  || "number");
+  const [sortDir,  setSortDir]  = useState(_ss('sortDir')  || "asc");
+
+  useEffect(()=>{ sessionStorage.setItem('purchaseList_dateFrom', dateFrom); }, [dateFrom]);
+  useEffect(()=>{ sessionStorage.setItem('purchaseList_dateTo',   dateTo);   }, [dateTo]);
+  useEffect(()=>{ sessionStorage.setItem('purchaseList_cpSearch', cpSearch); }, [cpSearch]);
+  useEffect(()=>{ sessionStorage.setItem('purchaseList_sortCol',  sortCol);  }, [sortCol]);
+  useEffect(()=>{ sessionStorage.setItem('purchaseList_sortDir',  sortDir);  }, [sortDir]);
+
+  const toggleSort = col => {
+    if (sortCol === col) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortCol(col); setSortDir("asc"); }
+  };
+  const sortIcon = col => sortCol === col ? (sortDir === "asc" ? " ▲" : " ▼") : " ↕";
+
+  const filtered = purchases
+    .filter(p => inDateRange(p.date, dateFrom, dateTo))
+    .filter(p => !cpSearch || p.counterparty.toLowerCase().includes(cpSearch.toLowerCase()))
+    .sort((a, b) => {
+      let av = a[sortCol], bv = b[sortCol];
+      if (sortCol === "amount" || sortCol === "qty") {
+        av = Number(av); bv = Number(bv);
+      } else if (sortCol === "date") {
+        const toISO = s => { const [d,m,y] = (s||"").split("."); return `${y}-${m}-${d}`; };
+        av = toISO(av); bv = toISO(bv);
+      } else {
+        av = String(av || "").toLowerCase(); bv = String(bv || "").toLowerCase();
+      }
+      if (av < bv) return sortDir === "asc" ? -1 : 1;
+      if (av > bv) return sortDir === "asc" ?  1 : -1;
+      return 0;
+    });
+
+  // Загрузить детали одной накладной
+  const loadDetails = async id => {
+    if (details[id]) return; // уже загружено
+    setLoadingId(id);
+    try {
+      const data = await api(`/orders-purchase/${id}`);
+      setDetails(prev => ({ ...prev, [id]: data.lines || [] }));
+    } catch(e) {}
+    setLoadingId(null);
+  };
+
+  // Одиночный клик — аккордеон
+  const handleRowClick = async (id) => {
+    const isOpen = expanded[id];
+    setExpanded(prev => ({ ...prev, [id]: !isOpen }));
+    if (!isOpen) await loadDetails(id);
+  };
+
+  // Кнопка "Детально" — раскрыть/свернуть все
+  const handleToggleAll = async () => {
+    const next = !allExpanded;
+    setAllExpanded(next);
+    if (next) {
+      const newExp = {};
+      for (const p of filtered) newExp[p.id] = true;
+      setExpanded(newExp);
+      // Загружаем детали для всех у кого нет
+      for (const p of filtered) {
+        if (!details[p.id]) await loadDetails(p.id);
+      }
+    } else {
+      setExpanded({});
+    }
+  };
+
+  const remove = id => {
+    api(`/orders-purchase/${id}`, 'DELETE')
+      .then(() => setPurchases(prev => prev.filter(p => p.id !== id)))
+      .catch(e => alert('Ошибка удаления: ' + e.message));
+    setConfirm(null);
+  };
+
+  const total = filtered.reduce((s, p) => s + p.amount, 0);
+
+  const inp = {
+    background: C.bg, border: `1px solid ${C.borderLight}`, color: C.text,
+    borderRadius: 5, padding: "4px 10px", fontSize: 12, outline: "none",
+  };
+
+  return (
+    <div style={{ display:"flex", justifyContent:"center", padding:"28px 24px" }}>
+      <div style={{ width:"100%", maxWidth:960 }}>
+
+        {/* ── Шапка ── */}
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+          <div>
+            <h1 style={{ color:C.text, fontSize:20, fontWeight:700, letterSpacing:"-0.3px", margin:0 }}>
+              Приходные накладные
+            </h1>
+            <div style={{ color:C.textMuted, fontSize:12, marginTop:3 }}>{purchases.length} документов</div>
+          </div>
+          <div style={{ marginLeft:"auto", display:"flex", gap:8 }}>
+            <button onClick={handleToggleAll} style={{
+              padding:"7px 16px", background:"transparent",
+              border:`1px solid ${C.borderLight}`, borderRadius:6,
+              color:C.textMuted, fontFamily:"inherit", fontSize:13, fontWeight:600, cursor:"pointer"
+            }}>{allExpanded ? "Свернуть всё" : "Детально"}</button>
+            <button onClick={() => onNav("purchase_form")} style={{
+              padding:"7px 16px", background:C.accent, border:"none", borderRadius:6,
+              color:"#fff", fontFamily:"inherit", fontSize:13, fontWeight:600, cursor:"pointer"
+            }}>+ Новая закупка</button>
+          </div>
+        </div>
+
+        {/* ── Статы ── */}
+        <div style={{ display:"flex", gap:10, marginBottom:14, flexWrap:"wrap" }}>
+          {[
+            { l:"Всего документов", v:filtered.length+" шт.", c:C.text },
+            { l:"Итого сумма",      v:fmt(total)+" ₽",        c:C.tealText },
+          ].map((k, i) => (
+            <div key={i} style={{
+              background:C.surface, border:`1px solid ${C.border}`,
+              borderLeft:`3px solid ${k.c}`, borderRadius:8,
+              padding:"8px 14px", display:"inline-block", minWidth:0,
+            }}>
+              <div style={{ color:C.textDim, fontSize:11, marginBottom:2, whiteSpace:"nowrap" }}>{k.l}</div>
+              <div style={{ color:k.c, fontSize:15, fontWeight:700, whiteSpace:"nowrap" }}>{k.v}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Фильтры ── */}
+        <div style={{
+          display:"flex", alignItems:"center", gap:8, marginBottom:12,
+          padding:"10px 14px", background:C.surface,
+          border:`1px solid ${C.border}`, borderRadius:8, flexWrap:"wrap",
+        }}>
+          <span style={{ color:C.textMuted, fontSize:12, whiteSpace:"nowrap" }}>Период:</span>
+          <DateFilter dateFrom={dateFrom} dateTo={dateTo} onFrom={setDateFrom} onTo={setDateTo}/>
+          <div style={{ width:1, height:20, background:C.border, margin:"0 4px" }}/>
+          <input value={cpSearch} onChange={e => setCpSearch(e.target.value)}
+            placeholder="Поиск по контрагенту..." style={{ ...inp, width:200 }}/>
+          {cpSearch && (
+            <button type="button" onClick={() => setCpSearch("")}
+              style={{ background:"none", border:"none", color:C.redText, cursor:"pointer", fontSize:12, fontWeight:600 }}>
+              × сброс
+            </button>
+          )}
+        </div>
+
+        {/* ── Таблица ── */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8, overflow:"hidden" }}>
+          <div className="ct-wrap">
+            <table className="ct">
+              <thead>
+                <tr>
+                  <th style={{ width:20 }}></th>
+                  {[{k:"number",l:"Номер"},{k:"date",l:"Дата"},{k:"counterparty",l:"Поставщик"},{k:"warehouse",l:"Склад"}].map(col => (
+                    <th key={col.k} onClick={() => toggleSort(col.k)}
+                      style={{ cursor:"pointer", userSelect:"none", whiteSpace:"nowrap" }}>
+                      {col.l}<span style={{ color:C.textDim, fontSize:10 }}>{sortIcon(col.k)}</span>
+                    </th>
+                  ))}
+                  {[{k:"qty",l:"Кол-во"},{k:"amount",l:"Сумма"}].map(col => (
+                    <th key={col.k} className="r" onClick={() => toggleSort(col.k)}
+                      style={{ cursor:"pointer", userSelect:"none", whiteSpace:"nowrap" }}>
+                      {col.l}<span style={{ color:C.textDim, fontSize:10 }}>{sortIcon(col.k)}</span>
+                    </th>
+                  ))}
+                  <th>Примечание</th>
+                  <th style={{ width:100 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 && (
+                  <tr><td colSpan={9} style={{ padding:32, textAlign:"center", color:C.textDim }}>Нет документов</td></tr>
+                )}
+                {filtered.map(p => {
+                  const isOpen = !!expanded[p.id];
+                  const lines  = details[p.id] || [];
+                  return <>
+                    <tr key={p.id}
+                      onClick={() => handleRowClick(p.id)}
+                      onDoubleClick={e => { e.stopPropagation(); onOpen && onOpen(p.id); }}
+                      style={{ cursor:"pointer", background: isOpen ? C.surface+"88" : "transparent" }}>
+                      <td style={{ textAlign:"center", color:C.textMuted, fontSize:10, padding:"4px 6px" }}>
+                        {loadingId === p.id ? "…" : isOpen ? "▼" : "▶"}
+                      </td>
+                      <td><span style={{ color:C.tealText, fontFamily:"monospace", fontSize:12 }}>{p.number}</span></td>
+                      <td style={{ color:C.text, fontSize:12 }}>{p.date}</td>
+                      <td style={{ fontWeight:500, fontSize:12 }}>{p.counterparty}</td>
+                      <td style={{ color:C.text, fontSize:12 }}>{p.warehouse}</td>
+                      <td className="r"><span style={{ fontFamily:"monospace", color:C.text }}>{fmt(p.qty)}</span></td>
+                      <td className="r"><span style={{ fontWeight:700, fontFamily:"monospace", color:"#4ADE80" }}>{fmt(p.amount)} ₽</span></td>
+                      <td style={{ maxWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
+                        color:C.text, fontSize:11, fontStyle:"italic" }} title={p.note}>{p.note || ""}</td>
+                      <td>
+                        <div style={{ display:"flex", gap:3, justifyContent:"flex-end" }}>
+                          <button onClick={e => { e.stopPropagation(); onOpen && onOpen(p.id); }} style={{
+                            padding:"2px 8px", background:"transparent",
+                            border:`1px solid ${C.borderLight}`, color:C.textMuted,
+                            borderRadius:4, cursor:"pointer", fontSize:11, fontWeight:600,
+                          }}>Открыть</button>
+                        </div>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr key={p.id+"_detail"}>
+                        <td colSpan={9} style={{ padding:0, background:C.bg }}>
+                          <div style={{ padding:"8px 16px 12px 32px" }}>
+                            {lines.length === 0
+                              ? <div style={{ color:C.textDim, fontSize:12, padding:"8px 0" }}>Нет товарных позиций</div>
+                              : <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11 }}>
+                                  <thead>
+                                    <tr style={{ borderBottom:`1px solid ${C.border}` }}>
+                                      {["Товар","Партия","Сорт","Страна","Ед.","Кол-во","Цена","Сумма"].map((h,i) => (
+                                        <th key={i} style={{ padding:"4px 8px", textAlign: i>=5?"right":"left", color:C.textMuted, fontWeight:600, fontSize:10, textTransform:"uppercase" }}>{h}</th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {lines.map((l, i) => (
+                                      <tr key={i} style={{ borderBottom:`1px solid ${C.border}22`, background: i%2===0?"transparent":C.surface+"33" }}>
+                                        <td style={{ padding:"4px 8px", color:C.text, fontWeight:500 }}>{l.product_name||"—"}</td>
+                                        <td style={{ padding:"4px 8px", fontFamily:"monospace", color:C.accentText, fontSize:10 }}>{l.batch_number||"—"}</td>
+                                        <td style={{ padding:"4px 8px", color:C.textMuted }}>{l.grade_name||"—"}</td>
+                                        <td style={{ padding:"4px 8px", color:C.textMuted }}>{l.country_name||"—"}</td>
+                                        <td style={{ padding:"4px 8px", color:C.textMuted }}>{l.unit_short||"—"}</td>
+                                        <td style={{ padding:"4px 8px", textAlign:"right", fontFamily:"monospace", color:C.text }}>{fmt(Number(l.qty))}</td>
+                                        <td style={{ padding:"4px 8px", textAlign:"right", fontFamily:"monospace", color:C.textMuted }}>{fmt(Number(l.price))} ₽</td>
+                                        <td style={{ padding:"4px 8px", textAlign:"right", fontFamily:"monospace", fontWeight:600, color:C.tealText }}>{fmt(Math.round(Number(l.qty)*Number(l.price)))} ₽</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>;
+                })}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={5} style={{ color:C.textDim, fontSize:12 }}>
+                    Показано: {filtered.length} из {purchases.length}
+                  </td>
+                  <td className="r" colSpan={4}>
+                    <span style={{ color:C.tealText, fontWeight:600, fontFamily:"monospace" }}>
+                      {fmt(total)} ₽ итого
+                    </span>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      {confirm && (
+        <ConfirmDialog
+          text={`Удалить накладную «${confirm.name}»?`}
+          onConfirm={() => remove(confirm.id)}
+          onClose={() => setConfirm(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+export default PurchaseList;
