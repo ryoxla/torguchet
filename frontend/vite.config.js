@@ -10,5 +10,13 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
-  }
+  },
+  build: {
+    // Готовая сборка ложится в public/ сервера.
+    // emptyOutDir: false — не удалять vendor и уже лежащие assets.
+    // copyPublicDir: false — не затирать favicon/icons из frontend/public поверх клиентских.
+    outDir: '../public',
+    emptyOutDir: false,
+    copyPublicDir: false,
+  },
 })// rebuild

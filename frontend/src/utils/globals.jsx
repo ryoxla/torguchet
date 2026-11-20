@@ -292,20 +292,37 @@ export const NAV=[
 
 
 // ─── API СЛОЙ ────────────────────────────────────────────────────────────────
-export const API = 'https://trade-backend-production-6841.up.railway.app/api';
+// Относительный /api: собранный фронтенд ходит на тот же сервер, что отдал страницу.
+export const API = '/api';
+// Заполняется loadConfig() до первого рендера. mode: 'single' | 'multi'.
+export const APP_CONFIG = { mode: 'multi', version: '' };
+
+export async function loadConfig(){
+  try{
+    const r = await fetch(API + '/config');
+    if(r.ok) Object.assign(APP_CONFIG, await r.json());
+  }catch{ /* без сети остаётся mode=multi, version='' */ }
+}
+
 export async function api(path, method='GET', body=null){
-  const user = JSON.parse(sessionStorage.getItem('trade_user') || 'null');
+  const user = JSON.parse(sessionStorage.getItem('trade_user') || sessionStorage.getItem('cabinet_user') || 'null');
   const companyId = user?.company_id || '1';
-  const opts = {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Company-ID': String(companyId),
-      'X-User-ID': String(user?.id || '')
-    }
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Company-ID': String(companyId),
   };
+  if(user?.token) headers.Authorization = 'Bearer ' + user.token;
+  const opts = { method, headers };
   if(body) opts.body = JSON.stringify(body);
   const r = await fetch(API+path, opts);
+  if(r.status === 401 && !String(path).endsWith('/login')){
+    if(user?.token){
+      sessionStorage.removeItem('trade_user');
+      sessionStorage.removeItem('cabinet_user');
+      window.location.reload();
+    }
+    throw new Error('Сессия истекла, войдите заново');
+  }
   if(!r.ok) throw new Error(await r.text());
   return r.json();
 }

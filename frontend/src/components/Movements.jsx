@@ -28,8 +28,7 @@ function Movements() {
     api('/warehouses').then(r => setWarehouses(r)).catch(() => {});
     api('/counterparties').then(r => setCps(r)).catch(() => {});
     api('/grades').then(r => setGrades(r)).catch(() => {});
-    fetch('http://localhost:3000/api/stock-movements')
-      .then(r => r.json())
+    api('/stock-movements')
       .then(r => {
         const seen = new Set();
         const bs = [];

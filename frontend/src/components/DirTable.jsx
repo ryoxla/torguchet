@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { C, fmt, fmtDate, uniq, api, NAV, ROLE_PERMISSIONS, canAccess,
+import { C, fmt, fmtDate, uniq, api, APP_CONFIG, NAV, ROLE_PERMISSIONS, canAccess,
   Card, Btn, Lbl, Inp, Sel, Toggle, ConfirmDialog, PageHeader,
   StatusBadge, DTable, SectionCard, inDateRange, DateFilter,
   INIT_WAREHOUSES, INIT_CATEGORIES, INIT_UNITS, INIT_COUNTRIES, INIT_CURRENCIES,
@@ -42,7 +42,7 @@ const DIR_CFG={
       {k:"currency_code",label:"Валюта",mono:true,color:"#F59E0B"},
       {k:"phone",label:"Телефон",muted:true},
       {k:"credit_limit",label:"Лимит",custom:"money"},
-      {k:"has_cabinet",label:"Кабинет",custom:"cabinet"},
+      ...(APP_CONFIG.mode==="single"?[]:[{k:"has_cabinet",label:"Кабинет",custom:"cabinet"}]),
       {k:"active",label:"Статус",badge:true},
     ],
     fields:[
@@ -123,7 +123,7 @@ function DirModal({title,fields,data,onSave,onClose,isNew,cpCategories,currencie
         {isCounterparty&&!isNew&&<div style={{padding:"10px 20px 0",display:"flex",gap:6}}>
           <button style={tabStyle("main")} onClick={()=>setTab("main")}>Основное</button>
           <button style={tabStyle("aliases")} onClick={()=>setTab("aliases")}>🏢 Юридические лица</button>
-          {isCounterparty&&data?.id&&<button style={tabStyle("cabinet")} onClick={()=>setTab("cabinet")}>🔑 Кабинет</button>}
+          {APP_CONFIG.mode!=="single"&&isCounterparty&&data?.id&&<button style={tabStyle("cabinet")} onClick={()=>setTab("cabinet")}>🔑 Кабинет</button>}
         </div>}
         <div style={{padding:20}}>
           {tab==="main"&&fields.filter(f=>!f.cashOnly||(form.type==='cash')).map(f=><div key={f.k} style={{marginBottom:16}}>
@@ -314,7 +314,7 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
       api("/currencies","POST",{code:form.code,name:form.name,symbol:form.symbol||null,is_base:!!form.is_base})
         .then(saved=>{setData(prev=>[...prev,{...saved,active:true}]);setModal(null);}).catch(e=>alert("Ошибка: "+e.message));
     } else if(configKey==="users"){
-      api("/users","POST",{login:form.login,full_name:form.name,email:form.email||null,role_id:parseInt(form.role_id)||null,company_id:1,password:form.password||"changeme"})
+      api("/users","POST",{login:form.login,full_name:form.name,email:form.email||null,role_id:parseInt(form.role_id)||null,company_id:1,password:form.password||"changeme",is_admin:!!form.is_admin})
         .then(saved=>{
           const userData={...saved,name:saved.full_name,active:true,_perms:form._perms||{}};
           if(form._perms&&Object.keys(form._perms).length>0){
@@ -364,7 +364,7 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
       api(`/currencies/${form.id}`,"PUT",{code:form.code,name:form.name,symbol:form.symbol||null,is_base:!!form.is_base})
         .catch(e=>alert("Ошибка: "+e.message));
     } else if(configKey==="users"){
-      const putBody={login:form.login,full_name:form.name,email:form.email||null,role_id:parseInt(form.role_id)||null,is_active:form.active!==false,date_restrict:!!form.date_restrict};
+      const putBody={login:form.login,full_name:form.name,email:form.email||null,role_id:parseInt(form.role_id)||null,is_active:form.active!==false,date_restrict:!!form.date_restrict,is_admin:!!form.is_admin};
       if(form.password) putBody.password=form.password;
       api(`/users/${form.id}`,"PUT",putBody).then(()=>{
         // Сохраняем права в БД
@@ -408,7 +408,7 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
         </div>
         {configKey!=="cp_categories"&&<div style={{display:"flex",gap:8}}>
           <button onClick={onBack} style={{padding:"8px 16px",background:"transparent",border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>← Назад</button>
-          {!(configKey==="users" && currentUser?.master_role !== 'superadmin') && (
+          {!(configKey==="users" && !(currentUser?.master_role==="superadmin" || (APP_CONFIG.mode==="single" && currentUser?.master_role==="admin"))) && (
             <Btn primary onClick={()=>setModal({type:"add",row:configKey==="counterparties"?{...emptyRow,currency_id:currencies.find(c=>c.code==="RUB")?.id||1}:emptyRow})}>+ Добавить</Btn>
           )}
         </div>}

@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { C, fmt, fmtDate, uniq, api, NAV, ROLE_PERMISSIONS, canAccess,
+import { C, fmt, fmtDate, uniq, api, APP_CONFIG, NAV, ROLE_PERMISSIONS, canAccess,
   Card, Btn, Lbl, Inp, Sel, Toggle, ConfirmDialog, PageHeader,
   StatusBadge, DTable, SectionCard, inDateRange, DateFilter,
   INIT_WAREHOUSES, INIT_CATEGORIES, INIT_UNITS, INIT_COUNTRIES, INIT_CURRENCIES,
@@ -64,6 +64,7 @@ function UserModal({data,onSave,onClose,isNew,roles}){
                   style={{width:"100%",background:C.bg,border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,padding:"8px 12px",fontSize:13,outline:"none"}}/>
               </div>
               <Toggle value={!!form.active} onChange={v=>set("active",v)} label="Активен"/>
+              {APP_CONFIG.mode==="single"&&<Toggle value={!!form.is_admin} onChange={v=>set("is_admin",v)} label="Администратор (пользователи и очистка данных)"/>}
             </div>
           )}
           {tab==="perms"&&(

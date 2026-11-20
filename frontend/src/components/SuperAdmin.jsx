@@ -187,7 +187,7 @@ function SuperAdmin({ user, onCompanyChange }) {
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <div><Lbl req>Название</Lbl><input style={inputStyle} value={form.name} onChange={e=>set('name',e.target.value)} placeholder="ООО Ромашка" /></div>
               <div><Lbl>ИНН</Lbl><input style={inputStyle} value={form.inn} onChange={e=>set('inn',e.target.value)} placeholder="1234567890" /></div>
-              <div style={{ gridColumn:'1/-1' }}><Lbl req>Database URL</Lbl><input style={inputStyle} value={form.db_url} onChange={e=>set('db_url',e.target.value)} placeholder="postgresql://postgres:PASSWORD@host.railway.app:PORT/railway" /></div>
+              <div style={{ gridColumn:'1/-1' }}><Lbl req>Database URL</Lbl><input style={inputStyle} value={form.db_url} onChange={e=>set('db_url',e.target.value)} placeholder="postgresql://postgres:ПАРОЛЬ@localhost:5433/имя_новой_базы (базу создаст программа)" /></div>
               <div><Lbl>Логин admin</Lbl><input style={inputStyle} value={form.admin_login} onChange={e=>set('admin_login',e.target.value)} placeholder="admin_romashka" /></div>
               <div><Lbl>Пароль admin</Lbl><input style={inputStyle} type="password" value={form.admin_password} onChange={e=>set('admin_password',e.target.value)} /></div>
               <div style={{ gridColumn:'1/-1' }}><Lbl>Контакты</Lbl><input style={inputStyle} value={form.contacts} onChange={e=>set('contacts',e.target.value)} placeholder="Телефон, email..." /></div>

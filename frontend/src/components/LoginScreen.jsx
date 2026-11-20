@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { C, fmt, fmtDate, uniq, api, NAV, ROLE_PERMISSIONS, canAccess,
+import { C, fmt, fmtDate, uniq, api, APP_CONFIG, NAV, ROLE_PERMISSIONS, canAccess,
   Card, Btn, Lbl, Inp, Sel, Toggle, ConfirmDialog, PageHeader,
   StatusBadge, DTable, SectionCard, inDateRange, DateFilter,
   INIT_WAREHOUSES, INIT_CATEGORIES, INIT_UNITS, INIT_COUNTRIES, INIT_CURRENCIES,
@@ -25,11 +25,14 @@ function LoginScreen({onLogin}){
         onLogin({...data,_isCabinet:true});
       } else {
         const data=await api('/login','POST',{login,password});
-        sessionStorage.setItem('trade_user',JSON.stringify(data.user));
-        onLogin(data.user);
+        const user={...data.user,token:data.token};
+        sessionStorage.setItem('trade_user',JSON.stringify(user));
+        onLogin(user);
       }
     }catch(e){
-      setError("Неверный логин или пароль");
+      let msg="Нет связи с сервером";
+      try{ const j=JSON.parse(e.message); if(j&&j.error) msg=j.error; }catch{}
+      setError(msg);
     }finally{
       setLoading(false);
     }
@@ -47,7 +50,8 @@ function LoginScreen({onLogin}){
           <div style={{color:C.textMuted,fontSize:13,marginTop:4}}>Система управления оптовой торговлей</div>
         </div>
 
-        {/* Переключатель режима */}
+        {/* Переключатель режима — в одной базе личного кабинета нет */}
+        {APP_CONFIG.mode!=="single"&&(
         <div style={{display:"flex",background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,padding:4,marginBottom:20}}>
           <button onClick={()=>{setMode("admin");setError("");}} style={{flex:1,padding:"8px 0",border:"none",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600,background:mode==="admin"?C.accent:"transparent",color:mode==="admin"?"#fff":C.textMuted,transition:"all 0.15s"}}>
             Сотрудник
@@ -56,6 +60,7 @@ function LoginScreen({onLogin}){
             Личный кабинет
           </button>
         </div>
+        )}
 
         {/* Форма */}
         <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:12,padding:28}}>
@@ -86,6 +91,7 @@ function LoginScreen({onLogin}){
 
         <div style={{textAlign:"center",marginTop:16,color:C.textDim,fontSize:12}}>
           По вопросам доступа обратитесь к администратору
+          {APP_CONFIG.version&&<div style={{marginTop:6,fontSize:11,opacity:.7}}>Версия {APP_CONFIG.version}</div>}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { C, api, NAV, canAccess, useIsMobile, ThemeMenu, THEMES, setTheme, themeKeyForUser } from "../utils/globals";
+import { C, api, APP_CONFIG, NAV, canAccess, useIsMobile, ThemeMenu, THEMES, setTheme, themeKeyForUser } from "../utils/globals";
 import ClearDataModal from "./ClearDataModal";
 
 // ID пунктов которые уходят в дроп-меню «Сервис»
@@ -30,6 +30,7 @@ function TopBar({ screen, onNav, user, onLogout, userPerms, onCompanyChange }) {
     if (canAccess(user, item.id, userPerms) === false) return false;
     // «Очистить данные» видят только админы/суперадмины master (совпадает с серверной проверкой)
     if (item.id === 'clear_data' && !isMasterAdmin) return false;
+    if (item.id === 'intercompany' && APP_CONFIG.mode === 'single') return false;
     return true;
   });
   const isSuperAdmin= user?.master_role === 'superadmin';
@@ -304,6 +305,9 @@ function TopBar({ screen, onNav, user, onLogout, userPerms, onCompanyChange }) {
             >
               Выйти
             </button>
+            {APP_CONFIG.version && (
+              <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: C.textDim }}>Версия {APP_CONFIG.version}</div>
+            )}
           </div>
         </div>
 
@@ -406,7 +410,7 @@ function TopBar({ screen, onNav, user, onLogout, userPerms, onCompanyChange }) {
       <div style={{ padding: "0 16px", borderLeft: `1px solid ${C.border}`, height: "100%", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <div style={{ textAlign: "right" }}>
           <div style={{ color: C.text, fontSize: 12, fontWeight: 600 }}>{user?.full_name || user?.login || '—'}</div>
-          <div style={{ color: C.textDim, fontSize: 10 }}>{isSuperAdmin ? 'Супер Админ' : user?.role_name || ''}</div>
+          <div style={{ color: C.textDim, fontSize: 10 }}>{isSuperAdmin ? 'Супер Админ' : user?.role_name || ''}{APP_CONFIG.version ? ` · v${APP_CONFIG.version}` : ''}</div>
         </div>
         <div style={{ width: 30, height: 30, borderRadius: "50%", background: isSuperAdmin ? 'linear-gradient(135deg,#f59e0b,#d97706)' : C.accentDim, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700 }}>{initials}</div>
         <ThemeMenu />
