@@ -69,8 +69,9 @@ function App(){
   const [reloadKey, setReloadKey] = useState(0);
   const [dbStatus,setDbStatus]=useState(null); // 'ok' | 'error'
 
-  // Загружаем справочники из базы при старте
+  // Справочники грузим только после входа: без пользователя эти запросы отвечают 401.
   useEffect(()=>{
+    if(!currentUser) return;
     Promise.all([
       api('/currencies'),
       api('/units'),
