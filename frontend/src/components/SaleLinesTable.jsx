@@ -215,7 +215,7 @@ function SaleLinesTable({lines,addLine,updLine,delLine,inp,currencyCode="RUB",cu
             {currencyCode!=="RUB"&&<div style={{fontSize:11,color:C.textMuted}}>{fmt(Math.round(filtTotal*currencyRate))} ₽</div>}
           </td>
           <td style={{padding:"8px 6px",textAlign:"center"}}>
-            {onSave&&<button onClick={onSave} disabled={saving} style={{padding:"4px 12px",background:saving?C.tealDim:C.teal,border:"none",color:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:12,fontWeight:700,whiteSpace:"nowrap"}}>{saving?"...":"Сохранить"}</button>}
+            {onSave&&<button onClick={onSave} disabled={saving} style={{padding:"4px 12px",background:saving?C.tealDim:C.teal,border:"none",color:saving?C.onTealDim:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:12,fontWeight:700,whiteSpace:"nowrap"}}>{saving?"...":"Сохранить"}</button>}
           </td>
           <td/>
         </tr></tfoot>

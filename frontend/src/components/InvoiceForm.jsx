@@ -254,7 +254,7 @@ function InvoiceForm({ onBack, onSaved, onDeleted, editId, warehouses, counterpa
             <button onClick={handleSave} disabled={saving || hasReturns} style={{
               padding:"7px 22px",
               background: (saving || hasReturns) ? C.accentDim : C.accent,
-              border:"none", color:"#fff", borderRadius:6,
+              border:"none", color:(saving || hasReturns) ? C.onAccentDim : "#fff", borderRadius:6,
               cursor: (saving || hasReturns) ? "not-allowed" : "pointer",
               fontSize:14, fontWeight:700,
             }}>{saving ? "Сохранение..." : "Сохранить"}</button>

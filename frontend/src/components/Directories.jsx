@@ -447,7 +447,7 @@ function Directories({cp,setCp,cpCategories,setCpCategories,grades,setGrades,uni
       <div style={{marginTop:16,padding:"18px 20px",background:C.surface,border:`1px solid ${C.border}`,borderRadius:8}}>
         <div style={{color:C.text,fontWeight:700,fontSize:14,marginBottom:8}}>⚙ Администрирование</div>
         <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
-          <button onClick={handleRecalc} disabled={recalcLoading} style={{padding:"8px 18px",background:recalcLoading?C.tealDim:C.teal,border:"none",color:"#fff",borderRadius:6,cursor:recalcLoading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{recalcLoading?"Пересчёт...":"🔄 Пересчитать остатки"}</button>
+          <button onClick={handleRecalc} disabled={recalcLoading} style={{padding:"8px 18px",background:recalcLoading?C.tealDim:C.teal,border:"none",color:recalcLoading?C.onTealDim:"#fff",borderRadius:6,cursor:recalcLoading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{recalcLoading?"Пересчёт...":"🔄 Пересчитать остатки"}</button>
           <div style={{color:C.textMuted,fontSize:12}}>Синхронизирует остатки на складе с движениями товаров</div>
         </div>
         {recalcResult&&<div style={{marginTop:10,color:C.greenText,fontSize:13,fontWeight:600}}>{recalcResult}</div>}

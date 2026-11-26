@@ -12,6 +12,8 @@ const THEME_BASE={
   yellow:"#D29922",yellowDim:"#3D2E0A",yellowText:"#E3B341",
   purple:"#8B5CF6",purpleDim:"#2D1F4E",purpleText:"#A78BFA",
   teal:"#00B4D8",tealDim:"#003D4D",tealText:"#48CAE4",scheme:"dark",
+  // Надпись кнопки на фоне accentDim/tealDim («Сохранение…»). В тёмных темах белая, как раньше.
+  onAccentDim:"#FFFFFF",onTealDim:"#FFFFFF",
   // Доп. оттенки для строк таблиц, плашек и кнопок-«мягких» (раньше были зашиты в компонентах под тёмную тему)
   accentSoft:"#1A2D3D",rowOpen:"#1a2030",rowSub:"#161e2e",rowSubHover:"#1e2535",
   infoSoft:"#1e3a5f",violetSoft:"#3a1e5f",greenSoft:"#1a3a2a",
@@ -31,6 +33,8 @@ export const THEMES={
     yellow:"#B45309",yellowDim:"#FEF3C7",yellowText:"#92400E",
     purple:"#7C3AED",purpleDim:"#EDE9FE",purpleText:"#6D28D9",
     teal:"#0891B2",tealDim:"#CFFAFE",tealText:"#0E7490",scheme:"light",
+    // На бледном accentDim/tealDim белый текст не читается — берём тёмную пару из палитры.
+    onAccentDim:"#1D4ED8",onTealDim:"#0E7490",
     accentSoft:"#DBEAFE",rowOpen:"#E3ECFA",rowSub:"#F3F6FB",rowSubHover:"#E8EEF7",
     infoSoft:"#DBEAFE",violetSoft:"#EDE9FE",greenSoft:"#DCFCE7",
     greenBright:"#15803D",redBright:"#B91C1C",amberBright:"#92400E",blueBright:"#1D4ED8",violetBright:"#6D28D9",
@@ -46,6 +50,7 @@ export const THEMES={
     yellow:"#F0B429",yellowDim:"#4A3708",yellowText:"#FFD766",
     purple:"#A78BFA",purpleDim:"#3A2A66",purpleText:"#C4B5FD",
     teal:"#22D3EE",tealDim:"#0A4A5A",tealText:"#67E8F9",scheme:"dark",
+    onAccentDim:"#FFFFFF",onTealDim:"#FFFFFF",
     // Доп. оттенки для строк таблиц, плашек и кнопок-«мягких» (раньше были зашиты в компонентах под тёмную тему)
     accentSoft:"#1A2D3D",rowOpen:"#1a2030",rowSub:"#161e2e",rowSubHover:"#1e2535",
     infoSoft:"#1e3a5f",violetSoft:"#3a1e5f",greenSoft:"#1a3a2a",
@@ -173,7 +178,13 @@ export const TRANSFERS=[];
 
 // ─── UI КОМПОНЕНТЫ ────────────────────────────────────────────────────────────
 export const Card=({children,style})=><div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,...style}}>{children}</div>;
-export const Btn=({children,primary,small,danger,onClick,disabled})=><button type="button" onClick={onClick} disabled={disabled} style={{padding:small?"5px 12px":"8px 16px",background:primary?C.accent:danger?C.redDim:"transparent",color:primary?"#fff":danger?C.redText:C.text,border:primary?"none":danger?`1px solid ${C.red}`:`1px solid ${C.borderLight}`,borderRadius:6,cursor:disabled?"not-allowed":"pointer",fontSize:small?12:13,fontWeight:600,whiteSpace:"nowrap",opacity:disabled?0.5:1}}>{children}</button>;
+export const Btn=({children,primary,small,danger,onClick,disabled})=>{
+  const busy=!!disabled;
+  // Светлая тема: opacity 0.5 растворяет белую надпись в фоне страницы.
+  // Оставляем плотный accentDim и тёмный onAccentDim. Тёмные темы не меняются.
+  const lightPrimary=busy&&!!primary&&C.scheme==="light";
+  return <button type="button" onClick={onClick} disabled={disabled} style={{padding:small?"5px 12px":"8px 16px",background:primary?(lightPrimary?C.accentDim:C.accent):danger?C.redDim:"transparent",color:primary?(lightPrimary?C.onAccentDim:"#fff"):danger?C.redText:C.text,border:primary?"none":danger?`1px solid ${C.red}`:`1px solid ${C.borderLight}`,borderRadius:6,cursor:busy?"not-allowed":"pointer",fontSize:small?12:13,fontWeight:600,whiteSpace:"nowrap",opacity:busy&&!lightPrimary?0.5:1}}>{children}</button>;
+};
 export const Lbl=({children,req})=><label style={{color:C.textMuted,fontSize:11,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:"0.05em"}}>{children}{req&&<span style={{color:C.redText}}> *</span>}</label>;
 export const Inp=({value,onChange,placeholder,type})=><input type={type||"text"} value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{width:"100%",background:C.bg,border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,padding:"8px 12px",fontSize:13,outline:"none"}}/>;
 export const Sel=({value,onChange,options,ph})=><select value={value||""} onChange={e=>onChange(e.target.value)} style={{width:"100%",background:C.bg,border:`1px solid ${C.borderLight}`,color:value?C.text:C.textMuted,borderRadius:6,padding:"8px 12px",fontSize:13,outline:"none"}}>{ph&&<option value="">{ph}</option>}{options.map(o=><option key={o.v||o} value={o.v||o}>{o.l||o}</option>)}</select>;

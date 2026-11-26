@@ -606,7 +606,7 @@ function PurchaseForm({ onBack, onSaved, onDeleted, editId, warehouses, counterp
             </button>
           )}
           <button onClick={handleSave} disabled={saving}
-            style={{ padding: "11px", background: saving ? C.tealDim : C.teal, border: "none", color: "#fff", borderRadius: 8, cursor: saving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}>
+            style={{ padding: "11px", background: saving ? C.tealDim : C.teal, border: "none", color: saving ? C.onTealDim : "#fff", borderRadius: 8, cursor: saving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}>
             {saving ? "Сохранение..." : "Сохранить"}
           </button>
         </div>
@@ -693,7 +693,7 @@ function PurchaseForm({ onBack, onSaved, onDeleted, editId, warehouses, counterp
             </select>
             {corrError && <div style={{ color: C.redText, fontSize: 12, marginBottom: 10 }}>{corrError}</div>}
             <button onClick={handleCorrect} disabled={corrSaving}
-              style={{ width: "100%", padding: "11px", background: corrSaving ? C.tealDim : C.teal, border: "none", color: "#fff", borderRadius: 8, cursor: corrSaving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}>
+              style={{ width: "100%", padding: "11px", background: corrSaving ? C.tealDim : C.teal, border: "none", color: corrSaving ? C.onTealDim : "#fff", borderRadius: 8, cursor: corrSaving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}>
               {corrSaving ? "Выполняется..." : "Применить"}
             </button>
           </div>
@@ -730,7 +730,7 @@ function PurchaseForm({ onBack, onSaved, onDeleted, editId, warehouses, counterp
             {editId && (
               <button onClick={() => { if(isDateRestricted(currentUser, form.date)){alert("Нет доступа: можно удалять только документы сегодняшней датой");return;} setConfirmDel(true); }} style={{ padding: "7px 14px", background: "transparent", border: `1px solid ${C.red}`, color: C.redText, borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Удалить</button>
             )}
-            <button onClick={handleSave} disabled={saving} style={{ padding: "7px 22px", background: saving ? C.tealDim : C.teal, border: "none", color: "#fff", borderRadius: 6, cursor: saving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700 }}>
+            <button onClick={handleSave} disabled={saving} style={{ padding: "7px 22px", background: saving ? C.tealDim : C.teal, border: "none", color: saving ? C.onTealDim : "#fff", borderRadius: 6, cursor: saving ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 700 }}>
               {saving ? "Сохранение..." : "Сохранить"}
             </button>
           </div>
@@ -889,7 +889,7 @@ function PurchaseForm({ onBack, onSaved, onDeleted, editId, warehouses, counterp
                     {!isRub(form.currency_id) && <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2 }}>{fmt(Math.round(total * (parseFloat(form.currency_rate) || 1)))} ₽</div>}
                   </td>
                   <td style={{ padding: "10px 6px", textAlign: "center" }}>
-                    <button onClick={handleSave} disabled={saving} style={{ padding: "5px 12px", background: saving ? C.tealDim : C.teal, border: "none", color: "#fff", borderRadius: 6, cursor: saving ? "not-allowed" : "pointer", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>
+                    <button onClick={handleSave} disabled={saving} style={{ padding: "5px 12px", background: saving ? C.tealDim : C.teal, border: "none", color: saving ? C.onTealDim : "#fff", borderRadius: 6, cursor: saving ? "not-allowed" : "pointer", fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}>
                       {saving ? "..." : "Сохранить"}
                     </button>
                   </td>
@@ -1039,7 +1039,7 @@ function PurchaseForm({ onBack, onSaved, onDeleted, editId, warehouses, counterp
               {corrError && <div style={{ color: C.redText, fontSize: 12, marginBottom: 10 }}>{corrError}</div>}
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
                 <button onClick={() => { setCorrModal(null); setCorrError(""); }} style={{ padding: "7px 16px", background: "transparent", border: `1px solid ${C.borderLight}`, color: C.text, borderRadius: 6, cursor: "pointer", fontSize: 13 }}>Отмена</button>
-                <button onClick={handleCorrect} disabled={corrSaving} style={{ padding: "7px 20px", background: corrSaving ? C.tealDim : C.teal, border: "none", color: "#fff", borderRadius: 6, cursor: corrSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{corrSaving ? "Выполняется..." : "Применить"}</button>
+                <button onClick={handleCorrect} disabled={corrSaving} style={{ padding: "7px 20px", background: corrSaving ? C.tealDim : C.teal, border: "none", color: corrSaving ? C.onTealDim : "#fff", borderRadius: 6, cursor: corrSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{corrSaving ? "Выполняется..." : "Применить"}</button>
               </div>
             </div>
           </div>

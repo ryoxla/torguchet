@@ -351,7 +351,7 @@ function Payments({ counterparties, accounts, currencies, articles, currentUser,
             {mutualError && <div style={{ color: C.redText, fontSize: 12, marginBottom: 8 }}>{mutualError}</div>}
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button onClick={() => setOpenMutual(false)} style={{ padding: "7px 16px", background: "transparent", border: `1px solid ${C.borderLight}`, color: C.text, borderRadius: 6, cursor: "pointer", fontSize: 13 }}>Отмена</button>
-              <button onClick={handleMutualSave} disabled={mutualSaving} style={{ padding: "7px 20px", background: mutualSaving ? C.accentDim : C.accent, border: "none", color: "#fff", borderRadius: 6, cursor: mutualSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{mutualSaving ? "Сохранение..." : "Провести взаимозачёт"}</button>
+              <button onClick={handleMutualSave} disabled={mutualSaving} style={{ padding: "7px 20px", background: mutualSaving ? C.accentDim : C.accent, border: "none", color: mutualSaving ? C.onAccentDim : "#fff", borderRadius: 6, cursor: mutualSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{mutualSaving ? "Сохранение..." : "Провести взаимозачёт"}</button>
             </div>
           </div>
         </div>

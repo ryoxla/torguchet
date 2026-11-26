@@ -449,7 +449,7 @@ function DebtImport() {
             <div style={{color:C.text,fontWeight:600}}>Предпросмотр: {rows.length} строк</div>
             <div style={{display:"flex",gap:8}}>
               <button onClick={()=>setRows([])} style={{padding:"7px 14px",background:"transparent",border:`1px solid ${C.borderLight}`,color:C.textMuted,borderRadius:6,cursor:"pointer",fontSize:13}}>Отмена</button>
-              <button onClick={handleImport} disabled={loading} style={{padding:"7px 20px",background:loading?C.tealDim:C.teal,border:"none",color:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>
+              <button onClick={handleImport} disabled={loading} style={{padding:"7px 20px",background:loading?C.tealDim:C.teal,border:"none",color:loading?C.onTealDim:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>
                 {loading?"Загрузка...":"✓ Создать накладные"}
               </button>
             </div>
@@ -578,7 +578,7 @@ function CreditorDebtImport() {
         <Card style={{padding:20,marginBottom:16}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
             <div style={{color:C.text,fontWeight:600}}>Предпросмотр: {rows.length} строк</div>
-            <button onClick={handleImport} disabled={loading} style={{padding:"7px 20px",background:loading?C.tealDim:C.teal,border:"none",color:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>
+            <button onClick={handleImport} disabled={loading} style={{padding:"7px 20px",background:loading?C.tealDim:C.teal,border:"none",color:loading?C.onTealDim:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>
               {loading?"Загрузка...":"✓ Создать накладные"}
             </button>
           </div>

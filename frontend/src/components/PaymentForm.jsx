@@ -175,7 +175,7 @@ function PaymentForm({onBack,onSaved,onDeleted,editId,direction:initDir,counterp
         </div>
         <button onClick={onBack} style={{padding:"7px 14px",background:"transparent",border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>← Назад</button>
         {editId&&<button onClick={()=>{ if(isDateRestricted(currentUser, form.payment_date)){alert("Нет доступа: можно удалять только документы сегодняшней датой");return;} setConfirmDel(true); }} style={{padding:"7px 14px",background:"transparent",border:`1px solid ${C.red}`,color:C.redText,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>Удалить</button>}
-        <button onClick={handleSave} disabled={saving} style={{padding:"7px 20px",background:saving?C.accentDim:C.accent,border:"none",color:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{saving?"Сохранение...":"Сохранить"}</button>
+        <button onClick={handleSave} disabled={saving} style={{padding:"7px 20px",background:saving?C.accentDim:C.accent,border:"none",color:saving?C.onAccentDim:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{saving?"Сохранение...":"Сохранить"}</button>
       </div>
       {confirmDel&&<ConfirmDialog text={`Удалить платёж ${form.number}?`} onConfirm={()=>{api(`/payments/${editId}`,"DELETE").then(()=>{if(onDeleted)onDeleted();}).catch(e=>alert(e.message));setConfirmDel(false);}} onClose={()=>setConfirmDel(false)}/>}
       {editId&&<div style={{display:"flex",gap:0,marginBottom:16,borderBottom:`1px solid ${C.border}`}}>

@@ -83,7 +83,7 @@ function LoginScreen({onLogin}){
           {error&&<div style={{color:C.redText,fontSize:13,marginBottom:14,background:C.redDim,padding:"8px 12px",borderRadius:6}}>{error}</div>}
           <button
             onClick={handleSubmit} disabled={loading}
-            style={{width:"100%",padding:"11px",background:loading?C.accentDim:C.accent,border:"none",color:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:14,fontWeight:700,transition:"background 0.15s"}}
+            style={{width:"100%",padding:"11px",background:loading?C.accentDim:C.accent,border:"none",color:loading?C.onAccentDim:"#fff",borderRadius:6,cursor:loading?"not-allowed":"pointer",fontSize:14,fontWeight:700,transition:"background 0.15s"}}
           >
             {loading?"Вход...":"Войти"}
           </button>
