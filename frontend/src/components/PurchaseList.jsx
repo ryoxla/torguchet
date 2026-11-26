@@ -220,7 +220,7 @@ function PurchaseList({ onNav, onOpen, refreshKey = 0 }) {
                       <td style={{ fontWeight:500, fontSize:12 }}>{p.counterparty}</td>
                       <td style={{ color:C.text, fontSize:12 }}>{p.warehouse}</td>
                       <td className="r"><span style={{ fontFamily:"monospace", color:C.text }}>{fmt(p.qty)}</span></td>
-                      <td className="r"><span style={{ fontWeight:700, fontFamily:"monospace", color:"#4ADE80" }}>{fmt(p.amount)} ₽</span></td>
+                      <td className="r"><span style={{ fontWeight:700, fontFamily:"monospace", color:C.greenBright }}>{fmt(p.amount)} ₽</span></td>
                       <td style={{ maxWidth:140, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
                         color:C.text, fontSize:11, fontStyle:"italic" }} title={p.note}>{p.note || ""}</td>
                       <td>

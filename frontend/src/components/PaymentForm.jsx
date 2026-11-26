@@ -24,7 +24,7 @@ function SearchSelect({value, onChange, options, placeholder="— Выберит
 
   return(
     <div ref={ref} style={{position:"relative",...style}}>
-      <div style={{display:"flex",alignItems:"center",background:C.bg,border:"1px solid #30363d",borderRadius:6,overflow:"hidden"}}>
+      <div style={{display:"flex",alignItems:"center",background:C.bg,border:`1px solid ${C.borderLight}`,borderRadius:6,overflow:"hidden"}}>
         <input
           value={open?query:selected?.label||""}
           onChange={e=>{setQuery(e.target.value);setOpen(true);if(!e.target.value){onChange("");}}}
@@ -36,7 +36,7 @@ function SearchSelect({value, onChange, options, placeholder="— Выберит
         <span style={{color:C.textMuted,padding:"0 8px",fontSize:11}}>{open?"▲":"▼"}</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:999,background:C.surface,border:"1px solid #30363d",borderRadius:6,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 24px rgba(0,0,0,0.5)",marginTop:2}}>
+        <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:999,background:C.surface,border:`1px solid ${C.borderLight}`,borderRadius:6,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 24px rgba(0,0,0,0.5)",marginTop:2}}>
           {filtered.length===0
             ?<div style={{padding:"10px 14px",color:C.textMuted,fontSize:12}}>Ничего не найдено</div>
             :filtered.map(o=>(
@@ -175,7 +175,7 @@ function PaymentForm({onBack,onSaved,onDeleted,editId,direction:initDir,counterp
         </div>
         <button onClick={onBack} style={{padding:"7px 14px",background:"transparent",border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>← Назад</button>
         {editId&&<button onClick={()=>{ if(isDateRestricted(currentUser, form.payment_date)){alert("Нет доступа: можно удалять только документы сегодняшней датой");return;} setConfirmDel(true); }} style={{padding:"7px 14px",background:"transparent",border:`1px solid ${C.red}`,color:C.redText,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>Удалить</button>}
-        <button onClick={handleSave} disabled={saving} style={{padding:"7px 20px",background:saving?C.accentDim:C.accent,border:"none",color:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{saving?"Сохранение...":"Сохранить"}</button>
+        <button onClick={handleSave} disabled={saving} style={{padding:"7px 20px",background:saving?C.accentDim:C.accent,border:"none",color:saving?C.onAccentDim:"#fff",borderRadius:6,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:600}}>{saving?"Сохранение...":"Сохранить"}</button>
       </div>
       {confirmDel&&<ConfirmDialog text={`Удалить платёж ${form.number}?`} onConfirm={()=>{api(`/payments/${editId}`,"DELETE").then(()=>{if(onDeleted)onDeleted();}).catch(e=>alert(e.message));setConfirmDel(false);}} onClose={()=>setConfirmDel(false)}/>}
       {editId&&<div style={{display:"flex",gap:0,marginBottom:16,borderBottom:`1px solid ${C.border}`}}>

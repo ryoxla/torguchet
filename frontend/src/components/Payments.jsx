@@ -18,14 +18,14 @@ function SearchSelect({ value, onChange, options, placeholder = "— Выбер�
   }, []);
   return (
     <div ref={ref} style={{ position: "relative", ...style }}>
-      <div style={{ display: "flex", alignItems: "center", background: C.bg, border: "1px solid #30363d", borderRadius: 6, overflow: "hidden" }}>
+      <div style={{ display: "flex", alignItems: "center", background: C.bg, border: `1px solid ${C.borderLight}`, borderRadius: 6, overflow: "hidden" }}>
         <input value={open ? query : selected?.label || ""} onChange={e => { setQuery(e.target.value); setOpen(true); if (!e.target.value) onChange(""); }} onFocus={() => { setQuery(""); setOpen(true); }} placeholder={placeholder}
           style={{ flex: 1, background: "transparent", border: "none", color: C.text, padding: "8px 12px", fontSize: 13, outline: "none" }}/>
         {value && <button type="button" onClick={() => { onChange(""); setQuery(""); }} style={{ background: "none", border: "none", color: C.textMuted, cursor: "pointer", padding: "0 8px", fontSize: 14 }}>×</button>}
         <span style={{ color: C.textMuted, padding: "0 8px", fontSize: 11 }}>{open ? "▲" : "▼"}</span>
       </div>
       {open && (
-        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 999, background: C.surface, border: "1px solid #30363d", borderRadius: 6, maxHeight: 220, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.5)", marginTop: 2 }}>
+        <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 999, background: C.surface, border: `1px solid ${C.borderLight}`, borderRadius: 6, maxHeight: 220, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.5)", marginTop: 2 }}>
           {filtered.length === 0
             ? <div style={{ padding: "10px 14px", color: C.textMuted, fontSize: 12 }}>Ничего не найдено</div>
             : filtered.map(o => (
@@ -213,7 +213,7 @@ function Payments({ counterparties, accounts, currencies, articles, currentUser,
         </div>
 
         {/* ── Таблица ── */}
-        <div style={{ background: C.surface, border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, overflow: "hidden" }}>
+        <div style={{ background: C.surface, border: `1px solid ${C.borderStrong}`, borderRadius: 8, overflow: "hidden" }}>
           <div className="ct-wrap">
             <table className="ct">
               <thead><tr>
@@ -351,7 +351,7 @@ function Payments({ counterparties, accounts, currencies, articles, currentUser,
             {mutualError && <div style={{ color: C.redText, fontSize: 12, marginBottom: 8 }}>{mutualError}</div>}
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <button onClick={() => setOpenMutual(false)} style={{ padding: "7px 16px", background: "transparent", border: `1px solid ${C.borderLight}`, color: C.text, borderRadius: 6, cursor: "pointer", fontSize: 13 }}>Отмена</button>
-              <button onClick={handleMutualSave} disabled={mutualSaving} style={{ padding: "7px 20px", background: mutualSaving ? C.accentDim : C.accent, border: "none", color: "#fff", borderRadius: 6, cursor: mutualSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{mutualSaving ? "Сохранение..." : "Провести взаимозачёт"}</button>
+              <button onClick={handleMutualSave} disabled={mutualSaving} style={{ padding: "7px 20px", background: mutualSaving ? C.accentDim : C.accent, border: "none", color: mutualSaving ? C.onAccentDim : "#fff", borderRadius: 6, cursor: mutualSaving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}>{mutualSaving ? "Сохранение..." : "Провести взаимозачёт"}</button>
             </div>
           </div>
         </div>

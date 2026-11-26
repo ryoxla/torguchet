@@ -391,9 +391,9 @@ function Stock() {
                     return (
                       <>
                         <tr key={g.product} onClick={() => setExpanded(e => ({ ...e, [g.product]: !e[g.product] }))}
-                          style={{ borderBottom: `1px solid ${C.border}`, cursor: "pointer", background: exp ? "#1a2030" : "transparent" }}
-                          onMouseEnter={e => e.currentTarget.style.background = exp ? "#1a2030" : C.surfaceHover}
-                          onMouseLeave={e => e.currentTarget.style.background = exp ? "#1a2030" : "transparent"}>
+                          style={{ borderBottom: `1px solid ${C.border}`, cursor: "pointer", background: exp ? C.rowOpen : "transparent" }}
+                          onMouseEnter={e => e.currentTarget.style.background = exp ? C.rowOpen : C.surfaceHover}
+                          onMouseLeave={e => e.currentTarget.style.background = exp ? C.rowOpen : "transparent"}>
                           <td style={{ padding: "12px 14px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <span style={{ color: C.textDim, fontSize: 13, display: "inline-block", transition: "transform 0.2s", transform: exp ? "rotate(90deg)" : "none" }}>▶</span>
@@ -407,9 +407,9 @@ function Stock() {
                           <td style={{ padding: "12px 14px", color: C.textDim, fontSize: 12 }}>{exp ? "↑ Свернуть" : "↓ Детали"}</td>
                         </tr>
                         {exp && g.rows.map(row => (
-                          <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}`, background: "#161e2e" }}
-                            onMouseEnter={e => e.currentTarget.style.background = "#1e2535"}
-                            onMouseLeave={e => e.currentTarget.style.background = "#161e2e"}>
+                          <tr key={row.id} style={{ borderBottom: `1px solid ${C.border}`, background: C.rowSub }}
+                            onMouseEnter={e => e.currentTarget.style.background = C.rowSubHover}
+                            onMouseLeave={e => e.currentTarget.style.background = C.rowSub}>
                             <td style={{ padding: "9px 14px 9px 44px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                 <span style={{ color: C.textDim }}>└</span>

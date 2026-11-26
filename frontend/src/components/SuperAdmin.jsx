@@ -160,8 +160,8 @@ function SuperAdmin({ user, onCompanyChange }) {
       </div>
 
       {/* Уведомления */}
-      {error && <div style={{ background:'#3D1A1A', border:'1px solid #F85149', borderRadius:8, padding:'10px 14px', color:'#FF7B72', fontSize:13, marginBottom:16 }}>{error}</div>}
-      {success && <div style={{ background:'#1A3D22', border:'1px solid #3FB950', borderRadius:8, padding:'10px 14px', color:'#56D364', fontSize:13, marginBottom:16 }}>{success}</div>}
+      {error && <div style={{ background:C.redDim, border:`1px solid ${C.red}`, borderRadius:8, padding:'10px 14px', color:C.redText, fontSize:13, marginBottom:16 }}>{error}</div>}
+      {success && <div style={{ background:C.greenDim, border:`1px solid ${C.green}`, borderRadius:8, padding:'10px 14px', color:C.greenText, fontSize:13, marginBottom:16 }}>{success}</div>}
 
       {/* Форма профиля */}
       {showProfile && (
@@ -214,7 +214,7 @@ function SuperAdmin({ user, onCompanyChange }) {
                   </div>
                   <div style={{ display:'flex', gap:8 }}>
                     {user?.company_id===c.id&&<span style={{ fontSize:10, color:C.accentText, background:C.accentDim, padding:'2px 7px', borderRadius:4, fontWeight:600 }}>текущая</span>}
-                    <span style={{ fontSize:10, color:c.is_active?'#56D364':C.textMuted, background:c.is_active?'#1A3D22':C.surface, padding:'2px 7px', borderRadius:4, border:`1px solid ${c.is_active?'#3FB950':C.border}` }}>
+                    <span style={{ fontSize:10, color:c.is_active?C.greenText:C.textMuted, background:c.is_active?C.greenDim:C.surface, padding:'2px 7px', borderRadius:4, border:`1px solid ${c.is_active?C.green:C.border}` }}>
                       {c.is_active?'активна':'отключена'}
                     </span>
                   </div>
@@ -233,7 +233,7 @@ function SuperAdmin({ user, onCompanyChange }) {
                     {editForm?'✕ Отмена':'✏ Изменить'}
                   </button>
                   <button onClick={()=>switchToCompany(selected)} style={{ background:C.accent, border:'none', color:'#fff', borderRadius:6, padding:'6px 12px', cursor:'pointer', fontSize:12, fontWeight:600 }}>Войти →</button>
-                  <button onClick={()=>toggleActive(selected)} style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:selected.is_active?C.redText:'#56D364', borderRadius:6, padding:'6px 12px', cursor:'pointer', fontSize:12 }}>
+                  <button onClick={()=>toggleActive(selected)} style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:selected.is_active?C.redText:C.greenText, borderRadius:6, padding:'6px 12px', cursor:'pointer', fontSize:12 }}>
                     {selected.is_active?'Отключить':'Включить'}
                   </button>
                 </div>
@@ -360,15 +360,15 @@ function SuperAdmin({ user, onCompanyChange }) {
                         <span style={{ fontSize:12, color:C.accentText, background:C.accentDim, padding:'2px 8px', borderRadius:4 }}>{u.company_name}</span>
                       </td>
                       <td style={{ padding:'10px 14px' }}>
-                        <span style={{ fontSize:11, color: u.role==='superadmin'?'#f59e0b': u.role==='admin'?C.accentText:C.textMuted, background: u.role==='superadmin'?'#3d2a00': u.role==='admin'?C.accentDim:'transparent', padding:'2px 7px', borderRadius:4 }}>{u.role}</span>
+                        <span style={{ fontSize:11, color: u.role==='superadmin'?C.orange: u.role==='admin'?C.accentText:C.textMuted, background: u.role==='superadmin'?C.orangeDim: u.role==='admin'?C.accentDim:'transparent', padding:'2px 7px', borderRadius:4 }}>{u.role}</span>
                       </td>
                       <td style={{ padding:'10px 14px' }}>
-                        <span style={{ fontSize:11, color:u.is_active?'#56D364':C.redText }}>{u.is_active?'Да':'Нет'}</span>
+                        <span style={{ fontSize:11, color:u.is_active?C.greenText:C.redText }}>{u.is_active?'Да':'Нет'}</span>
                       </td>
                       <td style={{ padding:'10px 14px' }}>
                         <div style={{ display:'flex', gap:4 }}>
                           <button onClick={()=>setEditUser({...u})} style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:C.textMuted, borderRadius:5, padding:'4px 10px', cursor:'pointer', fontSize:12 }}>✏</button>
-                          <button onClick={()=>setPwdPopup({userId:u.id, login:u.login, value:''})} title="Сменить пароль" style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:'#f59e0b', borderRadius:5, padding:'4px 8px', cursor:'pointer', fontSize:12 }}>🔑</button>
+                          <button onClick={()=>setPwdPopup({userId:u.id, login:u.login, value:''})} title="Сменить пароль" style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:C.orange, borderRadius:5, padding:'4px 8px', cursor:'pointer', fontSize:12 }}>🔑</button>
                           {u.role!=='superadmin'&&<button onClick={()=>handleDeleteUser(u)} style={{ background:'transparent', border:`1px solid ${C.borderLight}`, color:C.redText, borderRadius:5, padding:'4px 10px', cursor:'pointer', fontSize:12 }}>🗑</button>}
                         </div>
                       </td>

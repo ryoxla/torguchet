@@ -13,7 +13,7 @@ const TYPE_CFG = {
   "payment-in":  { label: "Платёж вх.", color: C.greenText  },
   "payment-out": { label: "Платёж исх.",color: C.redText    },
   return:      { label: "Возврат",      color: C.yellowText },
-  overhead:      { label: "Накл. расход",  color: "#A78BFA"    },
+  overhead:      { label: "Накл. расход",  color: C.purpleText },
   debt_writeoff: { label: "Списание долга", color: C.yellowText },
 };
 
@@ -509,8 +509,8 @@ function Counterparties({ counterparties, cpCategories, onNav }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
           <div style={{ fontWeight: 700, fontSize: 18, color: C.text }}>Взаиморасчёты</div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => onNav && onNav("debtors_report")}   style={{ padding: "5px 10px", background: "#1A2D3D", border: `1px solid ${C.accentText}`, color: C.accentText, borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Дебиторы</button>
-            <button onClick={() => onNav && onNav("creditors_report")} style={{ padding: "5px 10px", background: "#3D1A1A", border: `1px solid ${C.redText}`,    color: C.redText,    borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Кредиторы</button>
+            <button onClick={() => onNav && onNav("debtors_report")}   style={{ padding: "5px 10px", background: C.accentSoft, border: `1px solid ${C.accentText}`, color: C.accentText, borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Дебиторы</button>
+            <button onClick={() => onNav && onNav("creditors_report")} style={{ padding: "5px 10px", background: C.redDim, border: `1px solid ${C.redText}`,    color: C.redText,    borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: 600 }}>Кредиторы</button>
           </div>
         </div>
 
@@ -594,7 +594,7 @@ function Counterparties({ counterparties, cpCategories, onNav }) {
     const finalBal=totDeb-totKred;
     const finalTxt=finalBal<0?fmtA(Math.abs(finalBal))+" "+cur:finalBal>0?"-"+fmtA(finalBal)+" "+cur:"0";
     const finalCol=finalBal<0?C.greenText:finalBal>0?C.redText:C.greenText;
-    const typeColors={sale:C.accentText,purchase:C.tealText,"payment-in":C.greenText,"payment-out":C.redText,return:C.yellowText,overhead:"#A78BFA",debt_writeoff:C.yellowText};
+    const typeColors={sale:C.accentText,purchase:C.tealText,"payment-in":C.greenText,"payment-out":C.redText,return:C.yellowText,overhead:C.purpleText,debt_writeoff:C.yellowText};
     const typeLabels={sale:"Продажа",purchase:"Закупка","payment-in":"Платёж вх.","payment-out":"Платёж исх.",return:"Возврат",overhead:"Накл. расход",debt_writeoff:"Списание долга"};
     const thC={fontSize:11,fontWeight:600,padding:"6px 8px",borderBottom:`1px solid ${C.border}`,color:C.textMuted,whiteSpace:"nowrap",background:C.surface};
     const thR={...thC,textAlign:"right"};
@@ -717,8 +717,8 @@ function Counterparties({ counterparties, cpCategories, onNav }) {
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14,paddingBottom:16,borderBottom:`1px solid ${C.border}`}}>
           <h1 style={{color:C.text,fontSize:20,fontWeight:700,margin:0}}>Взаиморасчёты</h1>
           <div style={{marginLeft:"auto",display:"flex",gap:8}}>
-            <button onClick={()=>onNav&&onNav("debtors_report")}   style={{padding:"5px 14px",background:"#1A2D3D",border:`1px solid ${C.accentText}`,color:C.accentText,borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600}}>📋 Дебиторы</button>
-            <button onClick={()=>onNav&&onNav("creditors_report")} style={{padding:"5px 14px",background:"#3D1A1A",border:`1px solid ${C.redText}`,color:C.redText,borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600}}>📋 Кредиторы</button>
+            <button onClick={()=>onNav&&onNav("debtors_report")}   style={{padding:"5px 14px",background:C.accentSoft,border:`1px solid ${C.accentText}`,color:C.accentText,borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600}}>📋 Дебиторы</button>
+            <button onClick={()=>onNav&&onNav("creditors_report")} style={{padding:"5px 14px",background:C.redDim,border:`1px solid ${C.redText}`,color:C.redText,borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600}}>📋 Кредиторы</button>
           </div>
         </div>
         <Card style={{padding:"12px 16px",marginBottom:14}}>
