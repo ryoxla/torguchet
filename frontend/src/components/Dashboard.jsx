@@ -46,11 +46,11 @@ function DashboardMobile({ data, from, to, setFrom, setTo, dateStr, onNav }) {
         </div>
         <div style={{ display:"flex", gap:6 }}>
           <button onClick={() => onNav && onNav("debtors_report")}
-            style={{ padding:"5px 10px", background:"#1A2D3D", border:`1px solid ${C.accentText}`, color:C.accentText, borderRadius:6, cursor:"pointer", fontSize:11, fontWeight:600, fontFamily:"inherit" }}>
+            style={{ padding:"5px 10px", background:C.accentSoft, border:`1px solid ${C.accentText}`, color:C.accentText, borderRadius:6, cursor:"pointer", fontSize:11, fontWeight:600, fontFamily:"inherit" }}>
             Дебиторы
           </button>
           <button onClick={() => onNav && onNav("creditors_report")}
-            style={{ padding:"5px 10px", background:"#3D1A1A", border:`1px solid ${C.redText}`, color:C.redText, borderRadius:6, cursor:"pointer", fontSize:11, fontWeight:600, fontFamily:"inherit" }}>
+            style={{ padding:"5px 10px", background:C.redDim, border:`1px solid ${C.redText}`, color:C.redText, borderRadius:6, cursor:"pointer", fontSize:11, fontWeight:600, fontFamily:"inherit" }}>
             Кредиторы
           </button>
         </div>

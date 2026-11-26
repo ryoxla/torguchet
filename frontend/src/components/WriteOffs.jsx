@@ -480,7 +480,7 @@ function WriteOffs({ onNav, warehouses, products, currentUser }) {
             <tbody>
               {filteredWO.length === 0 && <tr><td colSpan={8} style={{ padding: 32, textAlign: "center", color: C.textDim }}>Нет данных</td></tr>}
               {filteredWO.map(w => {
-                const [rc, rb] = WO_REASON_COLORS[w.reason] || ["#7D8590", "#21262D"];
+                const [rc, rb] = WO_REASON_COLORS[w.reason] || [C.textMuted, C.border];
                 return (
                   <tr key={w.id} onDoubleClick={() => openDetail(w)} style={{ cursor: "pointer" }}>
                     <td><span style={{ color: C.purpleText, fontFamily: "monospace", fontSize: 12 }}>{w.number}</span></td>

@@ -4,7 +4,7 @@ import robotoBold from "./robotoBold";
 import { C, fmt, api, Btn, Card, PageHeader, SearchSelect, useIsMobile } from "../utils/globals";
 
 /* ─── цвета по просрочке ─── */
-const rowBg    = days => days > 60 ? "#3D1A1A" : days > 20 ? "#3D2A0A" : "transparent";
+const rowBg    = days => days > 60 ? C.redDim : days > 20 ? C.yellowDim : "transparent";
 const dayColor = days => days > 60 ? C.redText  : days > 20 ? C.yellowText : C.text;
 
 const fmtDate = d => {
@@ -87,7 +87,7 @@ function DebtorCardMobile({ cp, isDebtors, expanded, onToggle }) {
                     <span style={{
                       fontFamily: "monospace", fontWeight: 700, fontSize: 11,
                       color: dayColor(inv.days_passed),
-                      background: inv.days_passed > 60 ? C.redDim : inv.days_passed > 20 ? "#3D2A0A" : C.bg,
+                      background: inv.days_passed > 60 ? C.redDim : inv.days_passed > 20 ? C.yellowDim : C.bg,
                       padding: "2px 7px", borderRadius: 4, marginTop: 4, display: "inline-block",
                       border: `1px solid ${inv.days_passed > 60 ? C.redText : inv.days_passed > 20 ? C.yellowText : C.border}`
                     }}>{inv.days_passed} дн.</span>
@@ -519,8 +519,8 @@ const handlePDF = () => {
                           <td></td>
                           <td style={{ padding: "4px 8px" }}>
                             <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4,
-                              background: inv.doc_type === 'payment_out' ? "#1e3a5f" : inv.doc_type === 'payment_in' ? "#3a1e5f" : "#1a3a2a",
-                              color: inv.doc_type === 'payment_out' ? "#60a5fa" : inv.doc_type === 'payment_in' ? "#c084fc" : "#4ade80" }}>
+                              background: inv.doc_type === 'payment_out' ? C.infoSoft : inv.doc_type === 'payment_in' ? C.violetSoft : C.greenSoft,
+                              color: inv.doc_type === 'payment_out' ? C.blueBright : inv.doc_type === 'payment_in' ? C.violetBright : C.greenBright }}>
                               {inv.doc_type === 'payment_out' ? "Платёж ↑" : inv.doc_type === 'payment_in' ? "Платёж ↓" : "Накладная"}
                             </span>
                             <div style={{ fontSize: 10, color: C.textMuted, marginTop: 2, fontFamily: "monospace" }}>{inv.number}</div>
@@ -529,7 +529,7 @@ const handlePDF = () => {
                           <td className="r" style={{ fontFamily: "monospace", fontSize: 8, color: C.textMuted }}>{fmt(Math.round(inv.amount))} ₽</td>
                           <td className="r" style={{ fontFamily: "monospace", fontWeight: 700, color: dayColor(inv.days_passed) }}>{fmt(Math.round(cumulative))} ₽</td>
                           <td className="r">
-                            <span style={{ fontFamily: "monospace", fontWeight: 700, color: dayColor(inv.days_passed), background: inv.days_passed > 60 ? C.redDim : inv.days_passed > 20 ? "#3D2A0A" : "transparent", padding: "2px 8px", borderRadius: 4 }}>
+                            <span style={{ fontFamily: "monospace", fontWeight: 700, color: dayColor(inv.days_passed), background: inv.days_passed > 60 ? C.redDim : inv.days_passed > 20 ? C.yellowDim : "transparent", padding: "2px 8px", borderRadius: 4 }}>
                               {inv.days_passed}
                             </span>
                           </td>

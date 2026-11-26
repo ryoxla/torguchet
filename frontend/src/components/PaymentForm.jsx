@@ -24,7 +24,7 @@ function SearchSelect({value, onChange, options, placeholder="— Выберит
 
   return(
     <div ref={ref} style={{position:"relative",...style}}>
-      <div style={{display:"flex",alignItems:"center",background:C.bg,border:"1px solid #30363d",borderRadius:6,overflow:"hidden"}}>
+      <div style={{display:"flex",alignItems:"center",background:C.bg,border:`1px solid ${C.borderLight}`,borderRadius:6,overflow:"hidden"}}>
         <input
           value={open?query:selected?.label||""}
           onChange={e=>{setQuery(e.target.value);setOpen(true);if(!e.target.value){onChange("");}}}
@@ -36,7 +36,7 @@ function SearchSelect({value, onChange, options, placeholder="— Выберит
         <span style={{color:C.textMuted,padding:"0 8px",fontSize:11}}>{open?"▲":"▼"}</span>
       </div>
       {open&&(
-        <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:999,background:C.surface,border:"1px solid #30363d",borderRadius:6,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 24px rgba(0,0,0,0.5)",marginTop:2}}>
+        <div style={{position:"absolute",top:"100%",left:0,right:0,zIndex:999,background:C.surface,border:`1px solid ${C.borderLight}`,borderRadius:6,maxHeight:220,overflowY:"auto",boxShadow:"0 8px 24px rgba(0,0,0,0.5)",marginTop:2}}>
           {filtered.length===0
             ?<div style={{padding:"10px 14px",color:C.textMuted,fontSize:12}}>Ничего не найдено</div>
             :filtered.map(o=>(

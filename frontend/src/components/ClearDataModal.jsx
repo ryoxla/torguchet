@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
-import { api } from '../utils/globals'; // путь как в TopBar
+import { api, C as THEME } from '../utils/globals'; // путь как в TopBar
 
-const C = {
+// Палитра окна. В тёмных темах — прежние цвета окна, в светлой — цвета активной темы.
+const C = THEME.scheme === 'light' ? {
+  bg: THEME.bg,
+  surface: THEME.surface,
+  border: THEME.borderLight,
+  text: THEME.text,
+  muted: THEME.textMuted,
+  danger: '#DC2626',
+  dangerBg: THEME.redDim,
+  ok: THEME.greenText,
+  disabledBg: THEME.border,
+} : {
   bg: '#0f1117',
   surface: '#161b26',
   border: '#232a3a',
@@ -9,6 +20,8 @@ const C = {
   muted: '#8b93a7',
   danger: '#e5484d',
   dangerBg: '#2a1416',
+  ok: '#3dd68c',
+  disabledBg: '#3a2426',
 };
 
 // Таблицы-справочники: уходят в отдельную свёрнутую секцию «Справочники»
@@ -194,7 +207,7 @@ export default function ClearDataModal({ open, onClose }) {
 
           {msg && (
             <div style={{
-              fontSize: 13, color: msg.ok ? '#3dd68c' : C.danger,
+              fontSize: 13, color: msg.ok ? C.ok : C.danger,
               background: msg.ok ? 'transparent' : C.dangerBg,
               borderRadius: 8, padding: msg.ok ? 0 : '8px 12px',
             }}>
@@ -211,7 +224,7 @@ export default function ClearDataModal({ open, onClose }) {
             Отмена
           </button>
           <button onClick={run} disabled={!ready || busy} style={{
-            background: ready && !busy ? C.danger : '#3a2426', color: '#fff', border: 'none',
+            background: ready && !busy ? C.danger : C.disabledBg, color: '#fff', border: 'none',
             borderRadius: 8, padding: '9px 16px', cursor: ready && !busy ? 'pointer' : 'default',
             fontFamily: 'Geologica, sans-serif', opacity: ready && !busy ? 1 : 0.6,
           }}>

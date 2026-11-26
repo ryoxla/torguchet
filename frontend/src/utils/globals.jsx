@@ -12,6 +12,11 @@ const THEME_BASE={
   yellow:"#D29922",yellowDim:"#3D2E0A",yellowText:"#E3B341",
   purple:"#8B5CF6",purpleDim:"#2D1F4E",purpleText:"#A78BFA",
   teal:"#00B4D8",tealDim:"#003D4D",tealText:"#48CAE4",scheme:"dark",
+  // Доп. оттенки для строк таблиц, плашек и кнопок-«мягких» (раньше были зашиты в компонентах под тёмную тему)
+  accentSoft:"#1A2D3D",rowOpen:"#1a2030",rowSub:"#161e2e",rowSubHover:"#1e2535",
+  infoSoft:"#1e3a5f",violetSoft:"#3a1e5f",greenSoft:"#1a3a2a",
+  greenBright:"#4ade80",redBright:"#f87171",amberBright:"#fbbf24",blueBright:"#60a5fa",violetBright:"#c084fc",
+  orange:"#f59e0b",orangeDim:"#3d2a00",borderStrong:"rgba(255,255,255,0.15)",
 };
 
 export const THEMES={
@@ -26,6 +31,10 @@ export const THEMES={
     yellow:"#B45309",yellowDim:"#FEF3C7",yellowText:"#92400E",
     purple:"#7C3AED",purpleDim:"#EDE9FE",purpleText:"#6D28D9",
     teal:"#0891B2",tealDim:"#CFFAFE",tealText:"#0E7490",scheme:"light",
+    accentSoft:"#DBEAFE",rowOpen:"#E3ECFA",rowSub:"#F3F6FB",rowSubHover:"#E8EEF7",
+    infoSoft:"#DBEAFE",violetSoft:"#EDE9FE",greenSoft:"#DCFCE7",
+    greenBright:"#15803D",redBright:"#B91C1C",amberBright:"#92400E",blueBright:"#1D4ED8",violetBright:"#6D28D9",
+    orange:"#B45309",orangeDim:"#FEF3C7",borderStrong:"#CFD6DD",
   }},
   contrast:{ key:"contrast", label:"Контраст", colors: {
     bg:"#000000",surface:"#0D0D0D",surfaceHover:"#1A1A1A",
@@ -37,6 +46,11 @@ export const THEMES={
     yellow:"#F0B429",yellowDim:"#4A3708",yellowText:"#FFD766",
     purple:"#A78BFA",purpleDim:"#3A2A66",purpleText:"#C4B5FD",
     teal:"#22D3EE",tealDim:"#0A4A5A",tealText:"#67E8F9",scheme:"dark",
+    // Доп. оттенки для строк таблиц, плашек и кнопок-«мягких» (раньше были зашиты в компонентах под тёмную тему)
+    accentSoft:"#1A2D3D",rowOpen:"#1a2030",rowSub:"#161e2e",rowSubHover:"#1e2535",
+    infoSoft:"#1e3a5f",violetSoft:"#3a1e5f",greenSoft:"#1a3a2a",
+    greenBright:"#4ade80",redBright:"#f87171",amberBright:"#fbbf24",blueBright:"#60a5fa",violetBright:"#c084fc",
+    orange:"#f59e0b",orangeDim:"#3d2a00",borderStrong:"rgba(255,255,255,0.15)",
   }},
   emerald: { key:"emerald",  label:"Изумруд",  colors: { ...THEME_BASE, accent:"#10B981",accentDim:"#064E3B",accentText:"#6EE7B7" }},
   indigo:  { key:"indigo",   label:"Индиго",   colors: { ...THEME_BASE, accent:"#6366F1",accentDim:"#312E81",accentText:"#A5B4FC" }},
@@ -531,5 +545,5 @@ function renderCell(col,row,roles,cpCategories){
 }
 
 export const WO_REASONS={damage:"Порча",expiry:"Истёк срок",loss:"Недостача",other:"Прочее"};
-export const WO_REASON_COLORS={damage:["#F85149","#3D1A1A"],expiry:["#D29922","#3D2E0A"],loss:["#8B5CF6","#2D1F4E"],other:["#7D8590","#21262D"]};export const INIT_WRITE_OFFS=[];
+export const WO_REASON_COLORS={damage:[C.red,C.redDim],expiry:[C.yellow,C.yellowDim],loss:[C.purple,C.purpleDim],other:[C.textMuted,C.border]};export const INIT_WRITE_OFFS=[];
 export const INIT_RETURNS=[];

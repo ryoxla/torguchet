@@ -284,13 +284,13 @@ function App(){
         onCompanyChange={handleCompanyChange}
         userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>
       {dbStatus==='error'&&(
-        <div style={{position:"fixed",bottom:16,right:16,zIndex:200,background:"#3D1A1A",border:"1px solid #F85149",borderRadius:8,padding:"10px 16px",color:"#FF7B72",fontSize:12,maxWidth:320}}>
+        <div style={{position:"fixed",bottom:16,right:16,zIndex:200,background:C.redDim,border:`1px solid ${C.red}`,borderRadius:8,padding:"10px 16px",color:C.redText,fontSize:12,maxWidth:320}}>
           ⚠ API недоступен — работаем с тестовыми данными.<br/>
-          <span style={{color:"#7D8590"}}>Запустите: node server.js</span>
+          <span style={{color:C.textMuted}}>Запустите: node server.js</span>
         </div>
       )}
       {dbStatus==='ok'&&(
-        <div style={{position:"fixed",bottom:16,right:16,zIndex:200,background:"#1A3D22",border:"1px solid #3FB950",borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",color:"#56D364",fontSize:14}}>
+        <div style={{position:"fixed",bottom:16,right:16,zIndex:200,background:C.greenDim,border:`1px solid ${C.green}`,borderRadius:"50%",width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",color:C.greenText,fontSize:14}}>
           ✓
         </div>
       )}

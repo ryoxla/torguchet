@@ -428,7 +428,7 @@ function DebtImport() {
     } finally { setLoading(false); }
   };
 
-  const GREEN="#4ade80", RED="#f87171", AMBER="#fbbf24", BLUE="#60a5fa", MUTED="#6b7280";
+  const GREEN=C.greenBright, RED=C.redBright, AMBER=C.amberBright, BLUE=C.blueBright, MUTED="#6b7280";
 
   return (
     <div style={{maxWidth:700}}>
@@ -559,7 +559,7 @@ function CreditorDebtImport() {
     finally { setLoading(false); }
   };
 
-  const GREEN="#4ade80", RED="#f87171", AMBER="#fbbf24";
+  const GREEN=C.greenBright, RED=C.redBright, AMBER=C.amberBright;
 
   return (
     <div style={{maxWidth:700}}>
