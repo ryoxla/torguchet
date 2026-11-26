@@ -93,6 +93,13 @@ app.use(require('./adminClearData'));
 
 // ── AUDIT LOG ────────────────────────────────────────────────
 
+// Пользователь для журнала аудита берётся из токена входа (req.userId), а не из тела запроса.
+// created_by в теле можно не передать или подменить; токен подделать нельзя.
+function auditUserId(req) {
+  const n = parseInt(req.userId, 10);
+  return Number.isNaN(n) ? null : n;
+}
+
 async function logAudit(client, userId, tableName, recordId, action, oldData=null, newData=null) {
   try {
     // Безопасная сериализация — убираем circular references и функции
@@ -115,7 +122,7 @@ async function logAudit(client, userId, tableName, recordId, action, oldData=nul
 app.get('/api/audit/:table/:id', async (req, res) => {
   const { table, id } = req.params;
   const { rows } = await (await getPool(req.companyId)).query(`
-    SELECT al.*, u.full_name AS user_name
+    SELECT al.*, COALESCE(NULLIF(BTRIM(u.full_name), ''), u.login) AS user_name
     FROM audit_log al
     LEFT JOIN users u ON u.id = al.user_id
     WHERE al.table_name=$1 AND al.record_id=$2
@@ -139,7 +146,7 @@ app.get('/api/audit', async (req, res) => {
   const { rows } = await (await getPool(req.companyId)).query(`
     SELECT al.id, al.action, al.table_name, al.record_id,
            al.old_data, al.new_data, al.created_at,
-           u.full_name AS user_name
+           COALESCE(NULLIF(BTRIM(u.full_name), ''), u.login) AS user_name
     FROM audit_log al
     LEFT JOIN users u ON u.id = al.user_id
     ${where}
@@ -1447,7 +1454,7 @@ app.post('/api/orders-sale', async (req, res) => {
         toFloat(currency_rate) || 1,
         total,
         `Оплата по накладной ${number}`,
-        toInt(req.body.created_by) || null,
+        toInt(req.body.created_by) || auditUserId(req),
         order.id,
       ]);
     }
@@ -1460,7 +1467,7 @@ app.post('/api/orders-sale', async (req, res) => {
       WHERE osl.order_id=$1
     `, [posted.id]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'orders_sale', posted.id, 'INSERT', null, { ...posted, lines: auditSaleLines });
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_sale', posted.id, 'INSERT', null, { ...posted, lines: auditSaleLines });
     // ── Межкомпанейский журнал: если контрагент связан с компанией системы ──
     await createInterCompanyDoc({
       companyId: req.companyId,
@@ -1629,7 +1636,7 @@ app.post('/api/orders-purchase', async (req, res) => {
       WHERE opl.order_id=$1
     `, [posted.id]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'orders_purchase', posted.id, 'INSERT', null, { ...posted, lines: auditPurLines });
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_purchase', posted.id, 'INSERT', null, { ...posted, lines: auditPurLines });
     res.json(posted);
 
   } catch (e) {
@@ -1716,9 +1723,9 @@ app.post('/api/payments', async (req, res) => {
       toInt(currency_id), toFloat(currency_rate),
       toFloat(amount), toFloat(amount_base ?? amount),
       nullIfEmpty(payment_date), nullIfEmpty(purpose),
-      toInt(created_by), req.body.note||null,
+      (toInt(created_by) || auditUserId(req)), req.body.note||null,
       nullIfEmpty(legal_name), nullIfEmpty(pp_number)]);
-  await logAudit(cpPool, toInt(created_by), 'payments', rows[0].id, 'INSERT', null, rows[0]);
+  await logAudit(cpPool, auditUserId(req), 'payments', rows[0].id, 'INSERT', null, rows[0]);
   // ── Межкомпанейский журнал: если контрагент связан с компанией системы ──
   await createInterCompanyDoc({
     companyId: req.companyId,
@@ -2034,7 +2041,7 @@ app.post('/api/intercompany/documents/:id/accept', async (req, res) => {
       } catch (e) { console.error('mirror confirm:', e.message); }
     }
 
-    await logAudit(pool, toInt(created_by), 'orders_purchase', posted.id, 'INSERT', null, { ...posted, lines: auditPurLines });
+    await logAudit(pool, auditUserId(req), 'orders_purchase', posted.id, 'INSERT', null, { ...posted, lines: auditPurLines });
     res.json({ ok: true, purchase_id: posted.id, number: posted.number });
   } catch (e) {
     await client.query('ROLLBACK').catch(() => {});
@@ -3497,7 +3504,7 @@ app.put('/api/orders-purchase/:id', async (req, res) => {
       WHERE opl.order_id=$1
     `, [orderId]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'orders_purchase', orderId, 'UPDATE',
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_purchase', orderId, 'UPDATE',
       { ...order, lines: oldPurLines },
       { ...updated, lines: auditPurPutLines });
     res.json(updated);
@@ -3669,7 +3676,7 @@ app.put('/api/orders-sale/:id', async (req, res) => {
       await client.query(`
         INSERT INTO payments (number, direction, bank_account_id, counterparty_id, currency_id, currency_rate, amount, amount_base, payment_date, purpose, status, created_by, order_id)
         VALUES ($1,'incoming',$2,$3,$4,$5,$6,$6,now(),$7,'posted',$8,$9)
-      `, [nextPayNum, toInt(cash_account_id), null, toInt(currency_id), toFloat(currency_rate)||1, total, `Оплата по накладной ${number}`, toInt(req.body.created_by)||null, orderId]);
+      `, [nextPayNum, toInt(cash_account_id), null, toInt(currency_id), toFloat(currency_rate)||1, total, `Оплата по накладной ${number}`, toInt(req.body.created_by) || auditUserId(req), orderId]);
     } else if (wasCache && isCash) {
       // cash → cash: обновляем сумму, кассу и контрагента из актуальной накладной
       await client.query(
@@ -3686,7 +3693,7 @@ app.put('/api/orders-sale/:id', async (req, res) => {
       WHERE osl.order_id=$1
     `, [orderId]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'orders_sale', orderId, 'UPDATE',
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_sale', orderId, 'UPDATE',
       { ...order, lines: oldSaleLines },
       { ...updated, lines: auditSalePutLines });
     res.json(updated);
@@ -3746,7 +3753,7 @@ app.delete('/api/orders-sale/:id', async (req, res) => {
     await client.query('DELETE FROM order_sale_lines WHERE order_id=$1', [orderId]);
     await client.query('DELETE FROM orders_sale WHERE id=$1', [orderId]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), req.userId, 'orders_sale', orderId, 'DELETE', order, null);
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_sale', orderId, 'DELETE', order, null);
     res.json({ ok: true });
   } catch (e) {
     await client.query('ROLLBACK');
@@ -3851,7 +3858,7 @@ app.post('/api/orders-purchase/:id/correct-supplier', async (req, res) => {
     );
 
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(created_by), 'orders_purchase', orderId, 'UPDATE',
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_purchase', orderId, 'UPDATE',
       { correction: `Строка ${line.product_name} перенесена к поставщику ${new_supplier_id}` }, null);
 
     res.json({ ok: true, new_order_id: newOrder.id, new_number: newNumber });
@@ -3911,7 +3918,7 @@ app.delete('/api/orders-purchase/:id', async (req, res) => {
     await client.query("DELETE FROM overhead_costs WHERE document_type='purchase' AND document_id=$1", [orderId]);
     await client.query('DELETE FROM orders_purchase WHERE id=$1', [orderId]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), req.userId, 'orders_purchase', orderId, 'DELETE', order, null);
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'orders_purchase', orderId, 'DELETE', order, null);
     res.json({ ok: true });
   } catch (e) {
     await client.query('ROLLBACK');
@@ -3978,7 +3985,7 @@ app.put('/api/payments/:id', async (req, res) => {
       nullIfEmpty(payment_date), nullIfEmpty(purpose),
       req.body.note||null, nullIfEmpty(legal_name), nullIfEmpty(pp_number), id]);
   if (!row) return res.status(404).json({ error: 'Платёж не найден' });
-  await logAudit(await getPool(req.companyId), req.userId, 'payments', id, 'UPDATE', oldPay, row);
+  await logAudit(await getPool(req.companyId), auditUserId(req), 'payments', id, 'UPDATE', oldPay, row);
   res.json(row);
 });
 
@@ -4100,7 +4107,7 @@ app.delete('/api/payments/:id', async (req, res) => {
     await (await getPool(req.companyId)).query('DELETE FROM payment_allocations WHERE payment_id=$1', [id]);
     await (await getPool(req.companyId)).query(`UPDATE bank_statement_lines SET payment_id=NULL, status='new' WHERE payment_id=$1`, [id]);
     await (await getPool(req.companyId)).query('DELETE FROM payments WHERE id=$1', [id]);
-    await logAudit(await getPool(req.companyId), req.userId, 'payments', id, 'DELETE', pay, null);
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'payments', id, 'DELETE', pay, null);
     res.json({ ok: true });
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -4496,7 +4503,7 @@ app.post('/api/write-offs', async (req, res) => {
     const { rows: [wo] } = await client.query(`
       INSERT INTO write_offs (number, warehouse_id, reason, comment, status, total_amount, created_by, date)
       VALUES ($1, $2, $3, $4, 'posted', 0, $5, $6) RETURNING *
-    `, [number, toInt(warehouse_id), reason||'other', comment||null, toInt(created_by), date||new Date().toISOString().slice(0,10)]);
+    `, [number, toInt(warehouse_id), reason||'other', comment||null, (toInt(created_by) || auditUserId(req)), date||new Date().toISOString().slice(0,10)]);
 
     let totalAmount = 0;
 
@@ -4550,7 +4557,7 @@ app.post('/api/write-offs', async (req, res) => {
     `, [result.id]);
     console.log('write_offs audit: result.id=', result.id, 'lines=', auditWoLines.length);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(created_by), 'write_offs', result.id, 'INSERT', null, { ...result, lines: auditWoLines });
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'write_offs', result.id, 'INSERT', null, { ...result, lines: auditWoLines });
     res.json(result);
   } catch(e) {
     console.error('write_offs POST error:', e.message);
@@ -4649,7 +4656,7 @@ app.put('/api/write-offs/:id', async (req, res) => {
     }));
 
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'write_offs', id, 'UPDATE',
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'write_offs', id, 'UPDATE',
       { ...wo, lines: oldLinesWithNames },
       { ...result, lines: auditNewLines });
     res.json(result);
@@ -4791,7 +4798,7 @@ app.post('/api/returns', async (req, res) => {
     const { rows: [ret] } = await client.query(`
       INSERT INTO returns (number, order_id, counterparty_id, warehouse_id, reason, status, total_amount, created_by, date)
       VALUES ($1, $2, $3, $4, $5, 'posted', 0, $6, $7) RETURNING *
-    `, [number, toInt(order_id), toInt(counterparty_id), toInt(warehouse_id), reason||null, toInt(created_by), date||new Date().toISOString().slice(0,10)]);
+    `, [number, toInt(order_id), toInt(counterparty_id), toInt(warehouse_id), reason||null, (toInt(created_by) || auditUserId(req)), date||new Date().toISOString().slice(0,10)]);
 
     let totalAmount = 0;
 
@@ -4861,7 +4868,7 @@ app.post('/api/returns', async (req, res) => {
           toInt(order_id),
           totalAmount,
           `Возврат по накладной ${origOrder.number} (${number})`,
-          toInt(created_by) || null,
+          toInt(created_by) || auditUserId(req),
           ret.id,
         ]);
       }
@@ -4869,7 +4876,7 @@ app.post('/api/returns', async (req, res) => {
 
     const { rows: auditRetLines } = await client.query('SELECT * FROM return_lines WHERE return_id=$1', [ret.id]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(created_by), 'returns', ret.id, 'INSERT', null, { ...ret, total_amount: totalAmount, lines: auditRetLines });
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'returns', ret.id, 'INSERT', null, { ...ret, total_amount: totalAmount, lines: auditRetLines });
     res.json({ ...ret, total_amount: totalAmount });
   } catch(e) {
     await client.query('ROLLBACK');
@@ -4967,7 +4974,7 @@ app.post('/api/transfers', async (req, res) => {
     const { rows: [tr] } = await client.query(`
       INSERT INTO transfers (number, from_warehouse_id, to_warehouse_id, comment, status, total_amount, created_by)
       VALUES ($1,$2,$3,$4,'posted',0,$5) RETURNING *
-    `, [number, toInt(from_warehouse_id), toInt(to_warehouse_id), comment||null, toInt(created_by)]);
+    `, [number, toInt(from_warehouse_id), toInt(to_warehouse_id), comment||null, toInt(created_by) || auditUserId(req)]);
 
     let totalAmount = 0;
 
@@ -5032,7 +5039,7 @@ app.post('/api/transfers', async (req, res) => {
     await client.query('UPDATE transfers SET total_amount=$1 WHERE id=$2', [totalAmount, tr.id]);
     const { rows: auditTrLines } = await client.query('SELECT * FROM transfer_lines WHERE transfer_id=$1', [tr.id]);
     await client.query('COMMIT');
-    await logAudit(await getPool(req.companyId), toInt(req.body.created_by), 'transfers', tr.id, 'INSERT', null, { ...tr, lines: auditTrLines });
+    await logAudit(await getPool(req.companyId), auditUserId(req), 'transfers', tr.id, 'INSERT', null, { ...tr, lines: auditTrLines });
     res.json({ ...tr, total_amount: totalAmount });
   } catch(e) {
     await client.query('ROLLBACK');
@@ -5132,7 +5139,7 @@ app.post('/api/debt-writeoffs', async (req, res) => {
       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *,
         (SELECT name FROM counterparties WHERE id=$3) AS counterparty_name,
         (SELECT code FROM currencies WHERE id=$5) AS currency_code
-    `, [number, date||new Date().toISOString().slice(0,10), counterparty_id, amount, currency_id||null, note||null, created_by||null]);
+    `, [number, date||new Date().toISOString().slice(0,10), counterparty_id, amount, currency_id||null, note||null, created_by || auditUserId(req)]);
     res.json(row);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });

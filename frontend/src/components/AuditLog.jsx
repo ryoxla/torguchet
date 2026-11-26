@@ -169,7 +169,7 @@ function AuditLogScreen() {
         </select>
         <select value={filterUser} onChange={e=>setFilterUser(e.target.value)} style={inputStyle}>
           <option value="">Все пользователи</option>
-          {users.map(u => <option key={u.id} value={u.id}>{u.full_name}</option>)}
+          {users.map(u => <option key={u.id} value={u.id}>{u.full_name||u.login}</option>)}
         </select>
         <DateFilter dateFrom={dateFrom} dateTo={dateTo} onFrom={setDateFrom} onTo={setDateTo}/>
         <Btn primary small onClick={loadLog}>Применить</Btn>
