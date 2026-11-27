@@ -77,8 +77,15 @@ app.get('/api/config', (req, res) => res.json({ mode: SINGLE ? 'single' : 'multi
 
 // Фронтенд (собранный vite) отдаётся из папки public
 const PUBLIC_DIR = path.join(__dirname, 'public');
-app.use(express.static(PUBLIC_DIR));
+// index.html ссылается на бандлы с хэшем в имени. Его нельзя держать в кэше браузера:
+// после обновления старая копия укажет на уже удалённый бандл (белая страница).
+// no-cache = браузер каждый раз сверяется с сервером (304, если не менялся). Хэшированные assets кэшируются как обычно.
+const noCacheHtml = (res) => res.setHeader('Cache-Control', 'no-cache');
+app.use(express.static(PUBLIC_DIR, {
+  setHeaders: (res, filePath) => { if (/\.html?$/i.test(filePath)) noCacheHtml(res); },
+}));
 app.get('/', (req, res) => {
+  noCacheHtml(res);
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
@@ -1260,6 +1267,10 @@ app.put('/api/products/:id', async (req, res) => {
       default_grade_id, has_serial, has_batch, min_stock, weight_kg, is_active, req.params.id]);
   res.json(rows[0]);
 });
+
+// ── ИМПОРТ СПРАВОЧНИКОВ ИЗ EXCEL ─────────────────────────────
+// Контрагенты, сорта, товары: шаблон, предпросмотр и загрузка одной транзакцией (папка import/)
+require('./import')(app, { getPool });
 
 // ── ОСТАТКИ ──────────────────────────────────────────────────
 

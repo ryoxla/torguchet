@@ -344,7 +344,7 @@ function LegalEntitiesDir({data,setData,onBack}){
   );
 }
 
-function Directories({cp,setCp,cpCategories,setCpCategories,grades,setGrades,units,setUnits,countries,setCountries,currencies,setCurrencies,articles,setArticles,accounts,setAccounts,warehouses,setWarehouses,roles,setRoles,users,setUsers,products,setProducts,categories,onAddCategory,legalEntities,setLegalEntities,currentUser}){
+function Directories({cp,setCp,cpCategories,setCpCategories,grades,setGrades,units,setUnits,countries,setCountries,currencies,setCurrencies,articles,setArticles,accounts,setAccounts,warehouses,setWarehouses,roles,setRoles,users,setUsers,products,setProducts,categories,setCategories,onAddCategory,legalEntities,setLegalEntities,currentUser}){
   const [recalcLoading,setRecalcLoading]=useState(false);
   const [recalcResult,setRecalcResult]=useState(null);
   const handleRecalc=async()=>{
@@ -369,6 +369,19 @@ function Directories({cp,setCp,cpCategories,setCpCategories,grades,setGrades,uni
       api('/counterparties?all=true').then(r => setCp(r.map(c=>({...c,active:c.is_active})))).catch(()=>{});
     }
     setOpen(key);
+  };
+  // После импорта из Excel перечитываем справочник и связанные списки (категории, сорта)
+  const handleImported=(key)=>{
+    const reload=(path,setter,map)=>setter&&api(path).then(r=>setter(map?r.map(map):r)).catch(()=>{});
+    if(key==="counterparties"){
+      reload('/counterparties?all=true',setCp,c=>({...c,active:c.is_active}));
+      reload('/counterparty-categories',setCpCategories,c=>({...c,active:c.is_active??true}));
+    }
+    if(key==="grades"||key==="products") reload('/grades',setGrades,g=>({...g,code:g.code||'—',active:true}));
+    if(key==="products"){
+      reload('/products',setProducts,p=>({...p,active:p.is_active}));
+      reload('/product-categories',setCategories);
+    }
   };
   const dataMap={
     cp_categories:[cpCategories,setCpCategories],
@@ -399,7 +412,7 @@ function Directories({cp,setCp,cpCategories,setCpCategories,grades,setGrades,uni
   if(open){
     const d=dirs.find(d=>d.key===open);
     return <DirTable configKey={open} data={d.data} setData={d.setData} onBack={()=>setOpen(null)}
-      roles={roles} categories={categories} onAddCategory={onAddCategory} cpCategories={cpCategories} units={units} countries={countries} grades={grades} currencies={currencies} legalEntities={legalEntities||[]} currentUser={currentUser}/>;
+      roles={roles} categories={categories} onAddCategory={onAddCategory} cpCategories={cpCategories} units={units} countries={countries} grades={grades} currencies={currencies} legalEntities={legalEntities||[]} currentUser={currentUser} onImported={handleImported}/>;
   }
 
   // ── элементы лендинга + порядок/перетаскивание ──
