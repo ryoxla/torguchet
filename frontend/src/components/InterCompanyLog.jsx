@@ -1,18 +1,19 @@
 // ─── ЖУРНАЛ ВЗАИМНЫХ ДОКУМЕНТОВ МЕЖДУ КОМПАНИЯМИ ────────────────────────────
 import { useState, useEffect, useCallback } from "react";
-import { C, fmtDate, api, useIsMobile, Card, Btn, Lbl, SearchSelect } from "../utils/globals";
+import { C, fmtDate, api, useIsMobile, Card, Btn, Lbl, SearchSelect, onAppearanceChange } from "../utils/globals";
 
 const DOC_TYPE_LABELS = {
   sale: "Расходная", purchase: "Приходная",
   payment_in: "Платёж (вход.)", payment_out: "Платёж (исх.)",
 };
 
-const STATUS_META = {
+const _mk_STATUS_META=()=>({
   pending:   { label: "Ожидает",      bg: C.yellowDim, color: C.yellowText },
   confirmed: { label: "Подтверждено", bg: C.greenDim,  color: C.greenText },
   disputed:  { label: "Оспорено",     bg: C.redDim,    color: C.redText },
   changed:   { label: "Изменён",      bg: C.yellowDim, color: C.yellowText },
-};
+});
+let STATUS_META=_mk_STATUS_META(); onAppearanceChange(()=>{ STATUS_META=_mk_STATUS_META(); });
 
 const fmt2 = n => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n || 0));
 

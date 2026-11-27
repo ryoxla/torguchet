@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { C, api, APP_CONFIG, NAV, canAccess, useIsMobile, ThemeMenu, THEMES, setTheme, themeKeyForUser } from "../utils/globals";
+import { C, api, APP_CONFIG, NAV, canAccess, useIsMobile, ThemeMenu, AppearancePicker } from "../utils/globals";
 import ClearDataModal from "./ClearDataModal";
 
 // ID пунктов которые уходят в дроп-меню «Сервис»
@@ -277,23 +277,7 @@ function TopBar({ screen, onNav, user, onLogout, userPerms, onCompanyChange }) {
             </div>
             <div style={{ marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: C.textDim, letterSpacing: "0.06em", fontWeight: 600, marginBottom: 6 }}>ОФОРМЛЕНИЕ</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {Object.values(THEMES).map(t => {
-                  const active = t.key === themeKeyForUser();
-                  return (
-                    <button key={t.key} type="button" onClick={() => setTheme(t.key)} title={t.label}
-                      style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 9px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
-                        background: active ? C.accentDim : "transparent", border: `1px solid ${active ? C.accent : C.borderLight}`,
-                        color: active ? C.accentText : C.text, fontSize: 12 }}>
-                      <span style={{ display: "flex", gap: 2 }}>
-                        <span style={{ width: 10, height: 10, borderRadius: 2, background: t.colors.bg, border: `1px solid ${t.colors.borderLight}` }} />
-                        <span style={{ width: 10, height: 10, borderRadius: 2, background: t.colors.accent }} />
-                      </span>
-                      {t.label}
-                    </button>
-                  );
-                })}
-              </div>
+              <AppearancePicker compact />
             </div>
             <button
               onClick={onLogout}

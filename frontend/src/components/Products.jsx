@@ -6,7 +6,7 @@ import { C, fmt, fmtDate, uniq, api, NAV, ROLE_PERMISSIONS, canAccess,
   INIT_ARTICLES, INIT_ACCOUNTS, INIT_ROLES, INIT_USERS, INIT_CP_CATEGORIES,
   INIT_CP, INIT_PRODUCTS, INIT_PAYMENTS, INVOICES, PURCHASES, TRANSFERS,
   STOCK_DATA, MOVEMENTS, PURCHASE_LINES, INVOICE_LINES, STOCK_BY_PRODUCT,
-  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS } from "../utils/globals";
+  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS, onAppearanceChange } from "../utils/globals";
 
 import ProductCard from "./ProductCard";
 
@@ -48,7 +48,7 @@ function Products({products,categories,onOpen,onAddCategory}){
 
 
 
-const DIR_CFG={
+const _mk_DIR_CFG=()=>({
   warehouses:{
     title:"Склады",color:C.tealText,colorDim:C.tealDim,icon:"▣",
     desc:"Складские помещения и адреса",
@@ -102,7 +102,8 @@ const DIR_CFG={
   accounts:{title:"Счета и кассы",color:C.greenText,colorDim:C.greenDim,icon:"⊞",desc:"Расчётные счета и кассы",cols:[{k:"name",label:"Наименование",bold:true},{k:"type",label:"Тип",custom:"accountType"},{k:"currency",label:"Валюта",mono:true,muted:true},{k:"balance",label:"Остаток",custom:"money"},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Наименование",req:true},{k:"type",l:"Тип",sel:["bank","cash"],selL:["Расчётный счёт","Касса"]},{k:"currency",l:"Валюта"},{k:"account_number",l:"Номер счёта (необязательно)"},{k:"bik",l:"БИК банка (необязательно)"},{k:"bank_name",l:"Название банка (необязательно)"},{k:"active",l:"Активен",tog:true},{k:"is_default",l:"Касса по умолчанию",tog:true}]},
   roles:{title:"Роли",color:C.tealText,colorDim:C.tealDim,icon:"⬡",desc:"Роли пользователей системы",cols:[{k:"name",label:"Роль",bold:true},{k:"description",label:"Описание",muted:true},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Название роли",req:true},{k:"description",l:"Описание"},{k:"active",l:"Активна",tog:true}]},
   users:{title:"Пользователи",color:C.accentText,colorDim:C.accentDim,icon:"◈",desc:"Пользователи системы",cols:[{k:"name",label:"Имя",bold:true},{k:"login",label:"Логин",mono:true,color:C.accentText},{k:"email",label:"Email",muted:true},{k:"role_id",label:"Роль",custom:"role_ref"},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Полное имя",req:true},{k:"login",l:"Логин",req:true},{k:"email",l:"Email",req:true},{k:"role_id",l:"Роль",num:true},{k:"active",l:"Активен",tog:true}]},
-};
+});
+let DIR_CFG=_mk_DIR_CFG(); onAppearanceChange(()=>{ DIR_CFG=_mk_DIR_CFG(); });
 
 // ─── МОДАЛЬНОЕ ОКНО ПОЛЬЗОВАТЕЛЯ (с ролью, паролем, правами) ─────────────────
 const SECTION_LABELS={

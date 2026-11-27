@@ -6,13 +6,13 @@ import { C, fmt, fmtDate, uniq, api, APP_CONFIG, NAV, ROLE_PERMISSIONS, canAcces
   INIT_ARTICLES, INIT_ACCOUNTS, INIT_ROLES, INIT_USERS, INIT_CP_CATEGORIES,
   INIT_CP, INIT_PRODUCTS, INIT_PAYMENTS, INVOICES, PURCHASES, TRANSFERS,
   STOCK_DATA, MOVEMENTS, PURCHASE_LINES, INVOICE_LINES, STOCK_BY_PRODUCT,
-  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS, fmtQty } from "../utils/globals";
+  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS, fmtQty, onAppearanceChange } from "../utils/globals";
 
 import UserModal from "./UserModal";
 import ProductCard from "./ProductCard";
 import Products from "./Products";
 
-const DIR_CFG={
+const _mk_DIR_CFG=()=>({
   warehouses:{
     title:"Склады",color:C.tealText,colorDim:C.tealDim,icon:"▣",
     desc:"Складские помещения и адреса",
@@ -64,7 +64,8 @@ const DIR_CFG={
   articles:{title:"Статьи ДДС",color:C.purpleText,colorDim:C.purpleDim,icon:"≡",desc:"Классификация платежей",cols:[{k:"name",label:"Статья",bold:true},{k:"direction",label:"Направление",custom:"direction"},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Название статьи",req:true},{k:"direction",l:"Направление",sel:["incoming","outgoing","any"],selL:["Входящие","Исходящие","Любое"]},{k:"active",l:"Активна",tog:true}]},
   accounts:{title:"Счета и кассы",color:C.greenText,colorDim:C.greenDim,icon:"⊞",desc:"Расчётные счета и кассы",cols:[{k:"name",label:"Наименование",bold:true},{k:"type",label:"Тип",custom:"accountType"},{k:"currency",label:"Валюта",mono:true,muted:true},{k:"balance",label:"Остаток",custom:"money"},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Наименование",req:true},{k:"type",l:"Тип",sel:["bank","cash"],selL:["Расчётный счёт","Касса"]},{k:"currency",l:"Валюта"},{k:"account_number",l:"Номер счёта (необязательно)"},{k:"bik",l:"БИК банка (необязательно)"},{k:"bank_name",l:"Название банка (необязательно)"},{k:"active",l:"Активен",tog:true},{k:"is_default",l:"Касса по умолчанию",tog:true}]},
   users:{title:"Пользователи",color:C.accentText,colorDim:C.accentDim,icon:"◈",desc:"Пользователи системы",cols:[{k:"name",label:"Имя",bold:true},{k:"login",label:"Логин",mono:true,color:C.accentText},{k:"email",label:"Email",muted:true},{k:"active",label:"Статус",badge:true}],fields:[{k:"name",l:"Полное имя",req:true},{k:"login",l:"Логин",req:true},{k:"email",l:"Email",req:true},{k:"active",l:"Активен",tog:true}]},
-};
+});
+let DIR_CFG=_mk_DIR_CFG(); onAppearanceChange(()=>{ DIR_CFG=_mk_DIR_CFG(); });
 
 const DIR_DATA_MAP={
   warehouses:INIT_WAREHOUSES, products:INIT_PRODUCTS,

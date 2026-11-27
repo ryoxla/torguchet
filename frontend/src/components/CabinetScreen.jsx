@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { C, fmt, fmtDate, api, Card, Btn, useIsMobile } from "../utils/globals";
+import { C, fmt, fmtDate, api, Card, Btn, useIsMobile, onAppearanceChange } from "../utils/globals";
 
 /* ─── конфиг типов операций ─── */
-const TYPE_CONFIG = {
+const _mk_TYPE_CONFIG=()=>({
   sale:       { label: "Продажа",      color: C.accentText,  bg: C.accentText  + "22" },
   purchase:   { label: "Закупка",      color: C.tealText,    bg: C.tealText    + "22" },
   "pay-in":   { label: "Платёж вх.",   color: C.greenText,   bg: C.greenDim          },
   "pay-out":  { label: "Платёж исх.",  color: C.redText,     bg: C.redDim            },
   return:     { label: "Возврат",      color: C.yellowText,  bg: C.yellowDim         },
   overhead:   { label: "Накл. расход", color: C.purpleText||"#A78BFA", bg: (C.purpleDim||"#2D1F4E") },
-};
+});
+let TYPE_CONFIG=_mk_TYPE_CONFIG(); onAppearanceChange(()=>{ TYPE_CONFIG=_mk_TYPE_CONFIG(); });
 
 function typeKey(op) {
   if (op._type === "payment") return op.direction === "incoming" ? "pay-in" : "pay-out";

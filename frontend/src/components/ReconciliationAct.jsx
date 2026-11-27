@@ -1,6 +1,6 @@
 // ─── АКТ СВЕРКИ ВЗАИМНЫХ РАСЧЁТОВ МЕЖДУ КОМПАНИЯМИ ──────────────────────────
 import { useState, useEffect } from "react";
-import { C, fmtDate, api, useIsMobile, Card, Btn, Lbl } from "../utils/globals";
+import { C, fmtDate, api, useIsMobile, Card, Btn, Lbl, onAppearanceChange } from "../utils/globals";
 
 const fmt2 = n => new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n || 0));
 
@@ -9,12 +9,13 @@ const DOC_TYPE_LABELS = {
   payment_in: "Платёж вход.", payment_out: "Платёж исх.",
 };
 
-const ACT_STATUS = {
+const _mk_ACT_STATUS=()=>({
   draft:    { label: "Черновик",    color: C.textMuted },
   sent:     { label: "На сверке",   color: C.yellowText },
   agreed:   { label: "Согласован",  color: C.greenText },
   disputed: { label: "Расхождение", color: C.redText },
-};
+});
+let ACT_STATUS=_mk_ACT_STATUS(); onAppearanceChange(()=>{ ACT_STATUS=_mk_ACT_STATUS(); });
 
 export default function ReconciliationAct({ currentUser }) {
   const isMobile = useIsMobile();

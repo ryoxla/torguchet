@@ -46,3 +46,348 @@ table tr:last-child td {
 .r {
   text-align: right;
 }
+
+/* ════ Стили оформления A/B/C. Классический стиль — правила выше без изменений. ════
+   Активный стиль задаётся атрибутом <html data-style="…"> (utils/globals.jsx → applyAppearance). */
+
+/* ── A «Светлый SaaS»: Inter, мягкие тени, скругления ── */
+html[data-style="a"] body {
+  margin: 0;
+  font-family: 'Inter Variable', Inter, 'Segoe UI', system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss03";
+  background: var(--app-bg, #F5F7FB);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+html[data-style="a"] button,
+html[data-style="a"] input,
+html[data-style="a"] select,
+html[data-style="a"] textarea {
+  font-family: inherit;
+}
+html[data-style="a"] [style*="monospace"] {
+  font-family: 'Inter Variable', Inter, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+html[data-style="a"] td,
+html[data-style="a"] th {
+  font-variant-numeric: tabular-nums;
+}
+html[data-style="a"] table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+html[data-style="a"] table th {
+  color: var(--app-text-muted, #64748B);
+  background: var(--app-th-bg, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  white-space: nowrap;
+  border-right: none;
+  border-bottom: 1px solid var(--app-border-soft, #E7EAF1);
+}
+html[data-style="a"] table td {
+  color: var(--app-text, #0F172A);
+  border-bottom: 1px solid var(--app-border-soft, #E7EAF1);
+  border-right: none;
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+html[data-style="a"] table th:last-child,
+html[data-style="a"] table td:last-child {
+  border-right: none;
+}
+html[data-style="a"] table tr:last-child td {
+  border-bottom: none;
+}
+html[data-style="a"] tbody tr {
+  transition: background .12s;
+}
+html[data-style="a"] tbody tr:hover > td {
+  background: var(--app-surface-hover);
+}
+html[data-style="a"] .r {
+  text-align: right;
+}
+html[data-style="a"] input:not([type=checkbox]):not([type=radio]),
+html[data-style="a"] select,
+html[data-style="a"] textarea {
+  border-radius: var(--app-radius-sm, 9px) !important;
+  min-height: 34px;
+  transition: border-color .15s, box-shadow .15s;
+}
+html[data-style="a"] input:focus,
+html[data-style="a"] select:focus,
+html[data-style="a"] textarea:focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 3px var(--app-focus) !important;
+  outline: none;
+}
+html[data-style="a"] button:not([style*="50%"]) {
+  border-radius: var(--app-radius-sm, 9px) !important;
+  transition: background .15s, box-shadow .15s, transform .05s;
+}
+html[data-style="a"] button:active {
+  transform: translateY(1px);
+}
+html[data-style="a"] div[style*="border-radius: 8px"],
+html[data-style="a"] div[style*="border-radius: 10px"],
+html[data-style="a"] div[style*="border-radius: 12px"] {
+  border-radius: var(--app-radius, 14px) !important;
+}
+html[data-style="a"][data-scheme="light"] div[style*="background: rgb(255, 255, 255)"][style*="border: 1px solid"] {
+  box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.05);
+}
+html[data-style="a"][data-scheme="dark"] div[style*="background: rgb(18, 24, 41)"][style*="border: 1px solid"] {
+  box-shadow: 0 1px 2px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.15);
+}
+html[data-style="a"] h1 {
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+html[data-style="a"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-style="a"] ::-webkit-scrollbar-thumb {
+  background: var(--app-border, #D8DDE7);
+  border-radius: 10px;
+  border: 2px solid var(--app-bg);
+}
+html[data-style="a"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── B «Рабочий»: плотные таблицы, зебра, моноширинные суммы ── */
+html[data-style="b"] body {
+  margin: 0;
+  font-family: 'Inter Variable', Inter, 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  background: var(--app-bg, #ECEFF3);
+  -webkit-font-smoothing: antialiased;
+}
+html[data-style="b"] button,
+html[data-style="b"] input,
+html[data-style="b"] select,
+html[data-style="b"] textarea {
+  font-family: inherit;
+}
+html[data-style="b"] [style*="monospace"] {
+  font-family: 'JetBrains Mono Variable', 'Consolas', monospace !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+html[data-style="b"] td,
+html[data-style="b"] th {
+  font-variant-numeric: tabular-nums;
+}
+html[data-style="b"] div[style*="max-width: 960px"],
+html[data-style="b"] div[style*="max-width: 1100px"],
+html[data-style="b"] div[style*="max-width: 1200px"] {
+  max-width: 1400px !important;
+}
+html[data-style="b"] table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+html[data-style="b"] table th {
+  color: var(--app-text-muted, #4B5563);
+  background: var(--app-th-bg, #EEF2F5);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+  white-space: nowrap;
+  border-right: 1px solid var(--app-border-soft, #DCE1E7);
+  border-bottom: 1px solid var(--app-border, #C8D0D9);
+}
+html[data-style="b"] table td {
+  color: var(--app-text, #111827);
+  border-bottom: 1px solid var(--app-border-soft, #DCE1E7);
+  border-right: 1px solid var(--app-border-soft, #DCE1E7);
+  padding: 3px 10px;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  height: 30px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+html[data-style="b"] table th:last-child,
+html[data-style="b"] table td:last-child {
+  border-right: none;
+}
+html[data-style="b"] table tr:last-child td {
+  border-bottom: none;
+}
+html[data-style="b"] tbody tr:nth-child(even) > td {
+  background: var(--app-row-alt);
+}
+html[data-style="b"] tbody tr:hover > td {
+  background: var(--app-surface-hover) !important;
+}
+html[data-style="b"] .r {
+  text-align: right;
+}
+html[data-style="b"] input:not([type=checkbox]):not([type=radio]),
+html[data-style="b"] select,
+html[data-style="b"] textarea {
+  border-radius: var(--app-radius-sm, 4px) !important;
+}
+html[data-style="b"] input:focus,
+html[data-style="b"] select:focus,
+html[data-style="b"] textarea:focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 2px var(--app-focus) !important;
+  outline: none;
+}
+html[data-style="b"] button:not([style*="50%"]) {
+  border-radius: var(--app-radius-sm, 4px) !important;
+}
+html[data-style="b"] div[style*="border-radius: 8px"],
+html[data-style="b"] div[style*="border-radius: 10px"],
+html[data-style="b"] div[style*="border-radius: 12px"] {
+  border-radius: var(--app-radius, 6px) !important;
+}
+html[data-style="b"] h1 {
+  font-size: 19px !important;
+  letter-spacing: -0.01em !important;
+}
+html[data-style="b"] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+html[data-style="b"] ::-webkit-scrollbar-thumb {
+  background: var(--app-border, #C8D0D9);
+  border-radius: 6px;
+  border: 3px solid var(--app-bg);
+}
+
+/* ── C «Графит»: Manrope, градиентные акценты ── */
+html[data-style="c"] body {
+  margin: 0;
+  font-family: 'Manrope Variable', Manrope, 'Segoe UI', system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss03";
+  background: var(--app-bg, #F5F7FB);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+html[data-style="c"] button,
+html[data-style="c"] input,
+html[data-style="c"] select,
+html[data-style="c"] textarea {
+  font-family: inherit;
+}
+html[data-style="c"] [style*="monospace"] {
+  font-family: 'Manrope Variable', Manrope, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+html[data-style="c"] td,
+html[data-style="c"] th {
+  font-variant-numeric: tabular-nums;
+}
+html[data-style="c"] table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+html[data-style="c"] table th {
+  color: var(--app-text-muted, #64748B);
+  background: var(--app-th-bg, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  white-space: nowrap;
+  border-right: none;
+  border-bottom: 1px solid var(--app-border-soft, #E7EAF1);
+}
+html[data-style="c"] table td {
+  color: var(--app-text, #0F172A);
+  border-bottom: 1px solid var(--app-border-soft, #E7EAF1);
+  border-right: none;
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+html[data-style="c"] table th:last-child,
+html[data-style="c"] table td:last-child {
+  border-right: none;
+}
+html[data-style="c"] table tr:last-child td {
+  border-bottom: none;
+}
+html[data-style="c"] tbody tr {
+  transition: background .12s;
+}
+html[data-style="c"] tbody tr:hover > td {
+  background: var(--app-surface-hover);
+}
+html[data-style="c"] .r {
+  text-align: right;
+}
+html[data-style="c"] input:not([type=checkbox]):not([type=radio]),
+html[data-style="c"] select,
+html[data-style="c"] textarea {
+  border-radius: var(--app-radius-sm, 9px) !important;
+  min-height: 34px;
+  transition: border-color .15s, box-shadow .15s;
+}
+html[data-style="c"] input:focus,
+html[data-style="c"] select:focus,
+html[data-style="c"] textarea:focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 3px var(--app-focus) !important;
+  outline: none;
+}
+html[data-style="c"] button:not([style*="50%"]) {
+  border-radius: var(--app-radius-sm, 9px) !important;
+  transition: background .15s, box-shadow .15s, transform .05s;
+}
+html[data-style="c"] button:active {
+  transform: translateY(1px);
+}
+html[data-style="c"] div[style*="border-radius: 8px"],
+html[data-style="c"] div[style*="border-radius: 10px"],
+html[data-style="c"] div[style*="border-radius: 12px"] {
+  border-radius: var(--app-radius, 16px) !important;
+}
+html[data-style="c"][data-scheme="light"] div[style*="background: rgb(255, 255, 255)"][style*="border: 1px solid"] {
+  box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.05);
+}
+html[data-style="c"][data-scheme="dark"] div[style*="background: rgb(19, 19, 22)"][style*="border: 1px solid"] {
+  box-shadow: 0 1px 2px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.15);
+}
+html[data-style="c"] h1 {
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+html[data-style="c"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-style="c"] ::-webkit-scrollbar-thumb {
+  background: var(--app-border, #D8DDE7);
+  border-radius: 10px;
+  border: 2px solid var(--app-bg);
+}
+html[data-style="c"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+html[data-style="c"] table th {
+  background: transparent;
+  color: var(--app-text-muted);
+  font-size: 10.5px;
+  letter-spacing: .08em;
+}
+html[data-style="c"] ::selection {
+  background: var(--app-accent);
+  color: #fff;
+}
+
