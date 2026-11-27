@@ -6,7 +6,11 @@ import { C, fmt, fmtDate, uniq, api, NAV, ROLE_PERMISSIONS, canAccess,
   INIT_ARTICLES, INIT_ACCOUNTS, INIT_ROLES, INIT_USERS, INIT_CP_CATEGORIES,
   INIT_CP, INIT_PRODUCTS, INIT_PAYMENTS, INVOICES, PURCHASES, TRANSFERS,
   STOCK_DATA, MOVEMENTS, PURCHASE_LINES, INVOICE_LINES, STOCK_BY_PRODUCT,
-  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS } from "./utils/globals";
+  ALL_GRADES, INIT_WRITE_OFFS, INIT_RETURNS, WO_REASONS, WO_REASON_COLORS,
+  useIsMobile, layoutForStyle, applyAppearance } from "./utils/globals";
+import SideNav, { SIDE_W, RAIL_W } from "./components/SideNav";
+import WorkBar, { WORKBAR_H } from "./components/WorkBar";
+import CommandPalette from "./components/CommandPalette";
 import TopBar from "./components/TopBar";
 import Dashboard from "./components/Dashboard";
 import InvoiceList from "./components/InvoiceList";
@@ -34,6 +38,35 @@ import InterCompanyLog from "./components/InterCompanyLog";
 import DebtWriteoffs from "./components/DebtWriteoffs";
 
 function App(){
+  // Раскладка зависит от стиля оформления: top — прежнее верхнее меню, side/rail — боковое, work — шапка стиля B.
+  const isMobile=useIsMobile();
+  const layout=isMobile?'mobile':layoutForStyle();
+  const [paletteOpen,setPaletteOpen]=useState(false);
+  const navRef=useRef(null), screenRef=useRef(null), layoutRef=useRef(layout);
+  // Горячие клавиши во всех стилях: F2 — продажа, F3 — приход, F4 — платёж, Ctrl+K — поиск.
+  // На экране открытого документа F2/F3/F4 не срабатывают, чтобы не потерять несохранённые правки.
+  useEffect(()=>{
+    const h=e=>{
+      const u=JSON.parse(sessionStorage.getItem('trade_user')||'null');
+      if(!u||sessionStorage.getItem('cabinet_user')||!navRef.current) return;
+      if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.code==='KeyK'){
+        e.preventDefault();
+        if(layoutRef.current==='work') window.dispatchEvent(new Event('tu:search'));
+        else setPaletteOpen(true);
+        return;
+      }
+      const map={F2:'new_sale',F3:'new_purchase',F4:'payments'};
+      if(map[e.key]&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
+        e.preventDefault();
+        if(screenRef.current==='invoice_form'||screenRef.current==='purchase_form') return;
+        setPaletteOpen(false);
+        navRef.current(map[e.key]);
+      }
+    };
+    const open=()=>setPaletteOpen(true);
+    window.addEventListener('keydown',h); window.addEventListener('tu:palette',open);
+    return ()=>{ window.removeEventListener('keydown',h); window.removeEventListener('tu:palette',open); };
+  },[]);
   const [openPurchaseId,setOpenPurchaseId]=useState(null);
   const [openSaleId,setOpenSaleId]=useState(null);
   const [listRefresh,setListRefresh]=useState(0);
@@ -122,6 +155,9 @@ function App(){
     return c;
   };
   const nav=id=>{
+    // Быстрые действия «новый документ»: сбрасываем открытый документ, чтобы не открылся прошлый.
+    if(id==='new_sale'){ setOpenSaleId(null); id='invoice_form'; }
+    if(id==='new_purchase'){ setOpenPurchaseId(null); id='purchase_form'; }
     setSelectedProduct(null);
     // superadmin экран — всегда доступен для superadmin
     if(id==='superadmin'){
@@ -143,10 +179,12 @@ function App(){
     setScreen(id);
   };
   window.__appNav=nav;
+  navRef.current=nav; screenRef.current=screen; layoutRef.current=layout;
   const handleLogout=()=>{
     sessionStorage.removeItem('trade_user');
     sessionStorage.removeItem('cabinet_user');
     setCurrentUser(null);
+    applyAppearance(); // оформление гостя (экран входа)
   };
   const handleLogin=user=>{
     // Сбрасываем все справочники перед загрузкой новой компании
@@ -166,6 +204,7 @@ function App(){
     setLegalEntities([]);
     setUserPerms({});
     setCurrentUser(user);
+    applyAppearance(); // оформление, сохранённое этим пользователем
     // Суперадмин всегда открывает панель SA
     if(user?.master_role==='superadmin') setScreen('superadmin');
     setReloadKey(p=>p+1);
@@ -211,7 +250,7 @@ function App(){
   const screens={
     dashboard:     <Dashboard onNav={nav} refreshKey={dashRefresh}/>,
     invoices:      <InvoiceList onNav={nav} onOpen={id=>{setOpenSaleId(id);nav('invoice_form');}} refreshKey={listRefresh}/>,
-    invoice_form:  <InvoiceForm
+    invoice_form:  <InvoiceForm key={openSaleId||"new"}
                      onBack={()=>{setOpenSaleId(null);nav("invoices");}}
                      onSaved={()=>{setOpenSaleId(null);nav("invoices");}}
                      onDeleted={()=>{setOpenSaleId(null);nav("invoices");}}
@@ -224,7 +263,7 @@ function App(){
                      currentUser={currentUser}
                    />,
     purchases:     <PurchaseList onNav={nav} onOpen={id=>{setOpenPurchaseId(id);nav('purchase_form');}} refreshKey={listRefresh}/>,
-    purchase_form: <PurchaseForm
+    purchase_form: <PurchaseForm key={openPurchaseId||"new"}
                      onBack={()=>{setOpenPurchaseId(null);nav("purchases");}}
                      onSaved={()=>{setOpenPurchaseId(null);nav("purchases");}}
                      onDeleted={()=>{setOpenPurchaseId(null);nav("purchases");}}
@@ -280,9 +319,18 @@ function App(){
 
   return(
     <div style={{background:C.bg,minHeight:"100vh"}}>
-      <TopBar screen={screen} onNav={nav} user={currentUser} onLogout={handleLogout}
-        onCompanyChange={handleCompanyChange}
-        userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>
+      {(layout==='mobile'||layout==='top')&&
+        <TopBar screen={screen} onNav={nav} user={currentUser} onLogout={handleLogout}
+          onCompanyChange={handleCompanyChange}
+          userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>}
+      {(layout==='side'||layout==='rail')&&
+        <SideNav rail={layout==='rail'} screen={screen} onNav={nav} user={currentUser} onLogout={handleLogout}
+          userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>}
+      {layout==='work'&&
+        <WorkBar screen={screen} onNav={nav} user={currentUser} onLogout={handleLogout}
+          userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>}
+      <CommandPalette open={paletteOpen} onClose={()=>setPaletteOpen(false)} onNav={nav}
+        user={currentUser} userPerms={currentUser?userPerms[currentUser.id]||{}:{}}/>
       {dbStatus==='error'&&(
         <div style={{position:"fixed",bottom:16,right:16,zIndex:200,background:C.redDim,border:`1px solid ${C.red}`,borderRadius:8,padding:"10px 16px",color:C.redText,fontSize:12,maxWidth:320}}>
           ⚠ API недоступен — работаем с тестовыми данными.<br/>
@@ -294,7 +342,7 @@ function App(){
           ✓
         </div>
       )}
-      <div style={{paddingTop:52}}>
+      <div style={{paddingTop:layout==="work"?WORKBAR_H:(layout==="side"||layout==="rail")?0:52,marginLeft:layout==="side"?SIDE_W:layout==="rail"?RAIL_W:0}}>
         {screen==='payments'
           ?<Payments counterparties={cp} accounts={accounts} currencies={currencies} articles={articles} currentUser={currentUser} legalEntities={legalEntities} refreshKey={paymentsRefresh}/>
           :(screens[screen]||screens.dashboard)}

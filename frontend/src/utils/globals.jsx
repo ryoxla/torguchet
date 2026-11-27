@@ -69,53 +69,248 @@ export function themeKeyForUser(){
   }catch(e){ return "dark"; }
 }
 
-// C — активная палитра. Вычисляется при загрузке модуля из сохранённого пресета пользователя.
-export const C={ ...THEMES[themeKeyForUser()].colors };
-try{ document.documentElement.style.colorScheme = C.scheme || "dark"; }catch(e){}
-try{ const _r=document.documentElement.style; _r.setProperty("--app-text", C.text); _r.setProperty("--app-text-muted", C.textMuted); _r.setProperty("--app-border", C.borderLight); }catch(e){}
+// ── СТИЛИ ИНТЕРФЕЙСА (независимо от режима светлая/тёмная) ──
+// classic — прежний вид (верхнее меню, палитры THEMES). A/B/C — новые стили со своими палитрами и раскладкой.
+export const STYLES={
+  classic:{ key:"classic", label:"Классический", desc:"Прежний вид: верхнее меню", layout:"top" },
+  a:{ key:"a", label:"A · Светлый SaaS", desc:"Боковое меню с иконками, карточки, мягкие тени", layout:"side",
+    light:{
+      bg:"#F5F7FB",surface:"#FFFFFF",surfaceHover:"#F3F5FA",border:"#E7EAF1",borderLight:"#D8DDE7",
+      text:"#0F172A",textMuted:"#64748B",textDim:"#94A3B8",accent:"#4F46E5",accentDim:"#EEF0FF",
+      accentText:"#4338CA",green:"#16A34A",greenDim:"#DCFCE7",greenText:"#15803D",red:"#E11D48",
+      redDim:"#FFE4E8",redText:"#BE123C",yellow:"#D97706",yellowDim:"#FEF3C7",yellowText:"#B45309",
+      purple:"#7C3AED",purpleDim:"#EDE9FE",purpleText:"#6D28D9",teal:"#0891B2",tealDim:"#CFFAFE",
+      tealText:"#0E7490",scheme:"light",accentSoft:"#EEF0FF",rowOpen:"#EEF0FF",rowSub:"#F8FAFC",
+      rowSubHover:"#F1F5F9",infoSoft:"#E0E7FF",violetSoft:"#EDE9FE",greenSoft:"#DCFCE7",greenBright:"#15803D",
+      redBright:"#BE123C",amberBright:"#B45309",blueBright:"#4338CA",violetBright:"#6D28D9",orange:"#D97706",
+      orangeDim:"#FEF3C7",borderStrong:"#D8DDE7",radius:14,radiusSm:9,shadow:"0 1px 2px rgba(15,23,42,.04), 0 4px 16px rgba(15,23,42,.05)",
+      btnShadow:"0 1px 2px rgba(79,70,229,.25), 0 4px 12px rgba(79,70,229,.18)",ctrlBg:"#FFFFFF",thBg:"#F8FAFC",rowAlt:"transparent",focus:"rgba(79,70,229,.18)",
+      btnBg:"#FFFFFF",sideBg:"#FFFFFF",sideText:"#475569",sideActiveBg:"#EEF0FF",sideActiveText:"#4338CA",
+      inheritFont:true,onAccentDim:"#4338CA",onTealDim:"#0E7490",
+    },
+    dark:{
+      bg:"#0B1020",surface:"#121829",surfaceHover:"#182036",border:"#212A40",borderLight:"#2B3550",
+      text:"#E6EAF3",textMuted:"#8B95AE",textDim:"#5A6482",accent:"#6366F1",accentDim:"#252A5C",
+      accentText:"#A5B4FC",green:"#22C55E",greenDim:"#0F2E1C",greenText:"#4ADE80",red:"#F43F5E",
+      redDim:"#3A1420",redText:"#FB7185",yellow:"#F59E0B",yellowDim:"#382708",yellowText:"#FBBF24",
+      purple:"#A855F7",purpleDim:"#2B1948",purpleText:"#C084FC",teal:"#06B6D4",tealDim:"#0A3340",
+      tealText:"#67E8F9",scheme:"dark",accentSoft:"#1D2250",rowOpen:"#182042",rowSub:"#141B30",
+      rowSubHover:"#1A2240",infoSoft:"#1E2A55",violetSoft:"#2B1948",greenSoft:"#0F2E1C",greenBright:"#4ADE80",
+      redBright:"#FB7185",amberBright:"#FBBF24",blueBright:"#A5B4FC",violetBright:"#C084FC",orange:"#F59E0B",
+      orangeDim:"#382708",borderStrong:"rgba(255,255,255,0.12)",radius:14,radiusSm:9,shadow:"0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.18)",
+      btnShadow:"0 4px 14px rgba(99,102,241,.35)",ctrlBg:"#0F1526",thBg:"#0F1526",rowAlt:"transparent",focus:"rgba(99,102,241,.35)",
+      btnBg:"transparent",sideBg:"#0E1324",sideText:"#8B95AE",sideActiveBg:"#1D2250",sideActiveText:"#C7D2FE",
+      inheritFont:true,onAccentDim:"#FFFFFF",onTealDim:"#FFFFFF",
+    },
+  },
+  b:{ key:"b", label:"B · Рабочий", desc:"Плотные таблицы, крупный поиск, быстрые действия", layout:"work",
+    light:{
+      bg:"#ECEFF3",surface:"#FFFFFF",surfaceHover:"#EEF5F4",border:"#DCE1E7",borderLight:"#C8D0D9",
+      text:"#111827",textMuted:"#4B5563",textDim:"#8A94A3",accent:"#0F766E",accentDim:"#D7F0EB",
+      accentText:"#0F5F58",green:"#15803D",greenDim:"#DCF5E3",greenText:"#166534",red:"#C62828",
+      redDim:"#FDE5E5",redText:"#B71C1C",yellow:"#B45309",yellowDim:"#FDF0D5",yellowText:"#92400E",
+      purple:"#6D28D9",purpleDim:"#EDE9FE",purpleText:"#5B21B6",teal:"#0E7490",tealDim:"#D5F3F8",
+      tealText:"#155E75",scheme:"light",accentSoft:"#D7F0EB",rowOpen:"#E3F3F0",rowSub:"#F6F8FA",
+      rowSubHover:"#ECF3F2",infoSoft:"#DBEAFE",violetSoft:"#EDE9FE",greenSoft:"#DCF5E3",greenBright:"#166534",
+      redBright:"#B71C1C",amberBright:"#92400E",blueBright:"#1D4ED8",violetBright:"#5B21B6",orange:"#B45309",
+      orangeDim:"#FDF0D5",borderStrong:"#C8D0D9",radius:6,radiusSm:4,shadow:"none",
+      btnShadow:"none",ctrlBg:"#FFFFFF",thBg:"#EEF2F5",rowAlt:"#F7F9FA",focus:"rgba(15,118,110,.22)",
+      btnBg:"#FFFFFF",headBg:"#0F2A2E",headText:"#E6F2F1",headMuted:"#8FB3B0",searchBg:"#173A3F",
+      searchBorder:"#2A5A60",inheritFont:true,onAccentDim:"#0F5F58",onTealDim:"#155E75",
+    },
+    dark:{
+      bg:"#0E1113",surface:"#151A1D",surfaceHover:"#1B2427",border:"#232B30",borderLight:"#2F3A40",
+      text:"#E3E8EA",textMuted:"#97A4AB",textDim:"#5F6D74",accent:"#14B8A6",accentDim:"#0F3A36",
+      accentText:"#5EEAD4",green:"#22C55E",greenDim:"#11301D",greenText:"#4ADE80",red:"#EF4444",
+      redDim:"#3A1517",redText:"#F87171",yellow:"#F59E0B",yellowDim:"#372606",yellowText:"#FBBF24",
+      purple:"#A78BFA",purpleDim:"#2A2148",purpleText:"#C4B5FD",teal:"#22D3EE",tealDim:"#0A3540",
+      tealText:"#67E8F9",scheme:"dark",accentSoft:"#0F3A36",rowOpen:"#16302D",rowSub:"#12181B",
+      rowSubHover:"#1A2326",infoSoft:"#1B2F4D",violetSoft:"#2A2148",greenSoft:"#11301D",greenBright:"#4ADE80",
+      redBright:"#F87171",amberBright:"#FBBF24",blueBright:"#60A5FA",violetBright:"#C4B5FD",orange:"#F59E0B",
+      orangeDim:"#372606",borderStrong:"rgba(255,255,255,0.12)",radius:6,radiusSm:4,shadow:"none",
+      btnShadow:"none",ctrlBg:"#101518",thBg:"#12171A",rowAlt:"#13181B",focus:"rgba(20,184,166,.3)",
+      btnBg:"transparent",headBg:"#090C0E",headText:"#E3E8EA",headMuted:"#7E8C93",searchBg:"#151A1D",
+      searchBorder:"#2F3A40",inheritFont:true,onAccentDim:"#FFFFFF",onTealDim:"#FFFFFF",
+    },
+  },
+  c:{ key:"c", label:"C · Графит", desc:"Узкая панель иконок, градиентные акценты", layout:"rail",
+    light:{
+      bg:"#F6F5F2",surface:"#FFFFFF",surfaceHover:"#F4F2EE",border:"#E9E6E0",borderLight:"#DAD6CE",
+      text:"#18181B",textMuted:"#6B6B73",textDim:"#A1A1AA",accent:"#7C3AED",accentDim:"#F1EAFE",
+      accentText:"#6D28D9",green:"#059669",greenDim:"#DDF7EC",greenText:"#047857",red:"#E11D48",
+      redDim:"#FFE4E9",redText:"#BE123C",yellow:"#D97706",yellowDim:"#FEF3C7",yellowText:"#B45309",
+      purple:"#7C3AED",purpleDim:"#F1EAFE",purpleText:"#6D28D9",teal:"#0891B2",tealDim:"#CFFAFE",
+      tealText:"#0E7490",scheme:"light",accentSoft:"#F1EAFE",rowOpen:"#F3EDFE",rowSub:"#FAF9F7",
+      rowSubHover:"#F4F2EE",infoSoft:"#E0E7FF",violetSoft:"#F1EAFE",greenSoft:"#DDF7EC",greenBright:"#047857",
+      redBright:"#BE123C",amberBright:"#B45309",blueBright:"#4338CA",violetBright:"#6D28D9",orange:"#D97706",
+      orangeDim:"#FEF3C7",borderStrong:"#DAD6CE",radius:16,radiusSm:10,shadow:"0 1px 2px rgba(24,24,27,.04), 0 6px 20px rgba(24,24,27,.05)",
+      btnShadow:"0 6px 18px rgba(124,58,237,.28)",ctrlBg:"#FFFFFF",thBg:"#FAF9F7",rowAlt:"transparent",focus:"rgba(124,58,237,.18)",
+      btnBg:"#FFFFFF",sideBg:"#FFFFFF",sideText:"#6B6B73",sideActiveBg:"transparent",sideActiveText:"#18181B",
+      logoBg:"linear-gradient(135deg,#7C3AED,#0891B2)",hero:"linear-gradient(135deg,#7C3AED 0%,#4F46E5 55%,#0891B2 100%)",inheritFont:true,onAccentDim:"#6D28D9",onTealDim:"#0E7490",
+    },
+    dark:{
+      bg:"#09090B",surface:"#131316",surfaceHover:"#1C1C21",border:"#25252B",borderLight:"#33333B",
+      text:"#F4F4F5",textMuted:"#A1A1AA",textDim:"#62626C",accent:"#8B5CF6",accentDim:"#2A1F4D",
+      accentText:"#C4B5FD",green:"#34D399",greenDim:"#0E2B22",greenText:"#6EE7B7",red:"#FB7185",
+      redDim:"#3A1520",redText:"#FDA4AF",yellow:"#FBBF24",yellowDim:"#35290B",yellowText:"#FCD34D",
+      purple:"#A78BFA",purpleDim:"#2A1F4D",purpleText:"#C4B5FD",teal:"#22D3EE",tealDim:"#0B3138",
+      tealText:"#67E8F9",scheme:"dark",accentSoft:"#221A3D",rowOpen:"#1E1830",rowSub:"#111114",
+      rowSubHover:"#1A1A20",infoSoft:"#1E2A4A",violetSoft:"#2A1F4D",greenSoft:"#0E2B22",greenBright:"#6EE7B7",
+      redBright:"#FDA4AF",amberBright:"#FCD34D",blueBright:"#93C5FD",violetBright:"#C4B5FD",orange:"#FBBF24",
+      orangeDim:"#35290B",borderStrong:"rgba(255,255,255,0.12)",radius:16,radiusSm:10,shadow:"0 0 0 1px rgba(255,255,255,.02), 0 12px 32px rgba(0,0,0,.35)",
+      btnShadow:"0 6px 20px rgba(139,92,246,.35)",ctrlBg:"#0F0F12",thBg:"#16161A",rowAlt:"transparent",focus:"rgba(139,92,246,.35)",
+      btnBg:"transparent",sideBg:"#0C0C0F",sideText:"#8B8B95",sideActiveBg:"transparent",sideActiveText:"#F4F4F5",
+      logoBg:"linear-gradient(135deg,#8B5CF6,#06B6D4)",hero:"linear-gradient(135deg,#7C3AED 0%,#4F46E5 55%,#0891B2 100%)",inheritFont:true,onAccentDim:"#FFFFFF",onTealDim:"#FFFFFF",
+    },
+  },
+};
+
+// Стиль по умолчанию для тех, кто ещё ничего не выбирал: прежний вид, чтобы у клиентов ничего не поменялось само.
+export const DEFAULT_STYLE="classic";
+const _uid=()=>{ try{ return JSON.parse(sessionStorage.getItem("trade_user")||"null")?.id||"anon"; }catch(e){ return "anon"; } };
+export function styleKeyForUser(){
+  try{ const k=localStorage.getItem("trade_style_"+_uid()); return (k&&STYLES[k])?k:DEFAULT_STYLE; }
+  catch(e){ return DEFAULT_STYLE; }
+}
+export function layoutForStyle(k){ return STYLES[k||styleKeyForUser()]?.layout||"top"; }
+// Светлая/тёмная — по схеме выбранного пресета THEMES (контраст/изумруд/индиго в стилях A–C считаются тёмными).
+export function modeForTheme(k){ return (THEMES[k]?.colors?.scheme)==="light"?"light":"dark"; }
+function resolvePalette(styleKey, themeKey){
+  const base=(THEMES[themeKey]||THEMES.dark).colors;
+  if(styleKey==="classic"||!STYLES[styleKey]) return { ...base };
+  const mode=modeForTheme(themeKey);
+  return { ...THEMES[mode].colors, ...STYLES[styleKey][mode] };
+}
+
+// C — активная палитра. Объект один и тот же; при смене стиля/режима его содержимое
+// заменяется на месте (applyAppearance), а подписчики (корневой компонент) перерисовывают экран — без перезагрузки.
+export const C={};
+const _listeners=new Set();
+export function onAppearanceChange(cb){ _listeners.add(cb); return ()=>_listeners.delete(cb); }
+export function applyAppearance(){
+  const st=styleKeyForUser(), th=themeKeyForUser();
+  const pal=resolvePalette(st,th);
+  Object.keys(C).forEach(k=>{ delete C[k]; });
+  Object.assign(C,pal);
+  try{
+    const root=document.documentElement, r=root.style;
+    r.colorScheme=C.scheme||"dark";
+    r.setProperty("--app-text", C.text); r.setProperty("--app-text-muted", C.textMuted); r.setProperty("--app-border", C.borderLight);
+    const t={bg:C.bg,surface:C.surface,"surface-hover":C.surfaceHover,"border-soft":C.border,accent:C.accent,"accent-dim":C.accentDim,"accent-text":C.accentText,
+      "th-bg":C.thBg||"transparent","row-alt":C.rowAlt||"transparent","ctrl-bg":C.ctrlBg||C.bg,radius:(C.radius||8)+"px","radius-sm":(C.radiusSm||6)+"px",focus:C.focus||"rgba(47,129,247,.35)"};
+    Object.entries(t).forEach(([k,v])=>r.setProperty("--app-"+k,v));
+    root.dataset.style=st; root.dataset.scheme=C.scheme||"dark";
+  }catch(e){}
+  _listeners.forEach(cb=>{ try{ cb(); }catch(e){} });
+}
+applyAppearance();
 
 export function setTheme(key){
   if(!THEMES[key]) return;
-  try{
-    const u=JSON.parse(sessionStorage.getItem("trade_user")||"null");
-    localStorage.setItem("trade_theme_"+(u?.id||"anon"), key);
-  }catch(e){}
-  window.location.reload(); // перечитываем C с новым пресетом
+  try{ localStorage.setItem("trade_theme_"+_uid(), key); }catch(e){}
+  applyAppearance();
+}
+// Смена стиля меняет раскладку (меню пересоздаётся) — просим новое меню «Оформление» открыться снова.
+let _reopenPicker=false;
+export function setStyle(key,{fromPicker=false}={}){
+  if(!STYLES[key]) return;
+  if(fromPicker&&layoutForStyle(key)!==layoutForStyle()) _reopenPicker=true;
+  try{ localStorage.setItem("trade_style_"+_uid(), key); }catch(e){}
+  applyAppearance();
+}
+export function setMode(mode){
+  // В классическом стиле «Тёмная» = прежний тёмный пресет; цветные пресеты выбираются отдельно.
+  setTheme(mode==="light"?"light":"dark");
+}
+// Хук: компонент перерисуется при смене оформления. Возвращает ключ стиля.
+export function useAppearance(){
+  const [,setV]=useState(0);
+  useEffect(()=>onAppearanceChange(()=>setV(v=>v+1)),[]);
+  return styleKeyForUser();
 }
 
-// Переключатель темы (иконка + поповер со свотчами). Для меню пользователя в шапке.
-export function ThemeMenu(){
-  const [open,setOpen]=useState(false);
+// Выбор оформления: стиль (Классический/A/B/C) + режим (светлая/тёмная). Используется в меню «Оформление».
+export function AppearancePicker({compact=false}){
+  useAppearance();
+  const st=styleKeyForUser(), th=themeKeyForUser(), mode=modeForTheme(th);
+  const pal=(k,m)=>k==="classic"?THEMES[m].colors:{...THEMES[m].colors,...STYLES[k][m]};
+  const hdr={fontSize:10,color:C.textDim,letterSpacing:"0.08em",fontWeight:600,margin:"0 0 6px"};
+  const preview=(k)=>{
+    const p=pal(k,mode), lay=STYLES[k].layout;
+    const bar = lay==="side"? {left:0,top:0,bottom:0,width:16} : lay==="rail"? {left:0,top:0,bottom:0,width:8} : {left:0,right:0,top:0,height:lay==="work"?10:7};
+    const barBg = lay==="work" ? (p.headBg||p.surface) : (p.sideBg||p.surface);
+    const pad = lay==="side"?20: lay==="rail"?12:4, padT=lay==="work"?14:lay==="top"?11:4;
+    return (
+      <div style={{position:"relative",height:compact?34:44,borderRadius:6,background:p.bg,border:`1px solid ${p.border}`,overflow:"hidden",flexShrink:0,width:compact?54:"100%"}}>
+        <div style={{position:"absolute",...bar,background:barBg,borderRight:lay==="side"||lay==="rail"?`1px solid ${p.border}`:"none",borderBottom:lay==="top"||lay==="work"?`1px solid ${p.border}`:"none"}}/>
+        <div style={{position:"absolute",left:pad,top:padT,right:4,height:compact?8:11,borderRadius:(p.radiusSm||4)/2,background:p.surface,border:`1px solid ${p.border}`}}/>
+        <div style={{position:"absolute",left:pad,top:padT+(compact?11:15),width:compact?14:20,height:compact?6:8,borderRadius:3,background:p.accent}}/>
+        <div style={{position:"absolute",left:pad+(compact?17:24),top:padT+(compact?11:15),right:4,height:compact?6:8,borderRadius:3,background:p.surface,border:`1px solid ${p.border}`}}/>
+      </div>
+    );
+  };
+  const seg=(on)=>({flex:1,padding:"6px 8px",borderRadius:6,cursor:"pointer",fontSize:12.5,fontWeight:600,fontFamily:"inherit",
+    border:`1px solid ${on?C.accent:C.borderLight}`,background:on?C.accentDim:"transparent",color:on?C.accentText:C.text});
+  return (
+    <div style={{padding:compact?0:12,width:compact?"100%":320}} data-appearance-picker="">
+      <div style={hdr}>СТИЛЬ</div>
+      <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"1fr 1fr",gap:6,marginBottom:12}}>
+        {Object.values(STYLES).map(s=>{
+          const on=s.key===st;
+          return (
+            <button key={s.key} type="button" onClick={()=>setStyle(s.key,{fromPicker:!compact})} title={s.desc}
+              style={{display:"flex",flexDirection:compact?"row":"column",alignItems:compact?"center":"stretch",gap:compact?10:6,padding:compact?"6px 8px":7,borderRadius:8,cursor:"pointer",textAlign:"left",fontFamily:"inherit",
+                border:`${on?2:1}px solid ${on?C.accent:C.borderLight}`,background:on?C.accentDim:"transparent",color:C.text}}>
+              {preview(s.key)}
+              <span style={{display:"flex",flexDirection:"column",gap:1,minWidth:0}}>
+                <span style={{fontSize:12.5,fontWeight:700,color:on?C.accentText:C.text}}>{s.label}</span>
+                <span style={{fontSize:10.5,color:C.textMuted,lineHeight:1.25}}>{s.desc}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div style={hdr}>РЕЖИМ</div>
+      <div style={{display:"flex",gap:6}}>
+        <button type="button" onClick={()=>setMode("light")} style={seg(mode==="light")}>☀ Светлая</button>
+        <button type="button" onClick={()=>setMode("dark")} style={seg(mode==="dark"&&(st!=="classic"||th==="dark"))}>☾ Тёмная</button>
+      </div>
+      {st==="classic"&&(
+        <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
+          {["contrast","emerald","indigo"].map(k=>(
+            <button key={k} type="button" onClick={()=>setTheme(k)} style={{...seg(th===k),flex:"1 1 auto",fontWeight:500,fontSize:12}}>
+              <span style={{display:"inline-block",width:9,height:9,borderRadius:2,background:THEMES[k].colors.accent,marginRight:5}}/>{THEMES[k].label}
+            </button>
+          ))}
+        </div>
+      )}
+      {!compact&&<div style={{marginTop:12,paddingTop:10,borderTop:`1px solid ${C.border}`,fontSize:11,color:C.textMuted,lineHeight:1.5}}>
+        Клавиши: <b>F2</b> продажа · <b>F3</b> приход · <b>F4</b> платёж · <b>Ctrl+K</b> поиск
+      </div>}
+    </div>
+  );
+}
+
+// Кнопка «Оформление» с поповером. placement: "down" (шапка), "up" (низ бокового меню), "right" (узкая панель).
+export function ThemeMenu({placement="down",children}){
+  const [open,setOpen]=useState(()=>{ if(_reopenPicker){ _reopenPicker=false; return true; } return false; });
   const ref=useRef(null);
-  const cur=themeKeyForUser();
+  useAppearance();
   useEffect(()=>{
     const h=e=>{ if(ref.current&&!ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener("mousedown",h);
     return ()=>document.removeEventListener("mousedown",h);
   },[]);
+  const pos = placement==="up" ? {left:0,bottom:"calc(100% + 8px)"} : placement==="right" ? {left:"calc(100% + 10px)",bottom:0} : {right:0,top:"calc(100% + 8px)"};
   return(
     <div ref={ref} style={{position:"relative"}}>
-      <button type="button" onClick={()=>setOpen(o=>!o)} title="Оформление"
-        style={{background:"transparent",border:`1px solid ${C.borderLight}`,color:C.textMuted,borderRadius:5,padding:"4px 8px",cursor:"pointer",fontSize:13,lineHeight:1}}>🎨</button>
+      {children ? <span onClick={()=>setOpen(o=>!o)}>{children}</span> :
+      <button type="button" onClick={()=>setOpen(o=>!o)} title="Оформление" data-appearance-button=""
+        style={{background:"transparent",border:`1px solid ${C.borderLight}`,color:C.textMuted,borderRadius:5,padding:"4px 8px",cursor:"pointer",fontSize:13,lineHeight:1}}>🎨</button>}
       {open&&(
-        <div style={{position:"absolute",right:0,top:"calc(100% + 8px)",minWidth:190,background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,boxShadow:"0 8px 24px rgba(0,0,0,0.4)",zIndex:600,overflow:"hidden"}}>
-          <div style={{padding:"7px 12px",fontSize:10,color:C.textDim,letterSpacing:"0.08em",borderBottom:`1px solid ${C.border}`}}>ОФОРМЛЕНИЕ</div>
-          {Object.values(THEMES).map(t=>{
-            const active=t.key===cur;
-            return(
-              <button key={t.key} type="button" onClick={()=>setTheme(t.key)}
-                style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,padding:"8px 12px",background:active?C.accentDim:"transparent",border:"none",color:active?C.accentText:C.text,cursor:"pointer",fontSize:13,fontFamily:"inherit"}}
-                onMouseEnter={e=>{ if(!active) e.currentTarget.style.background=C.surfaceHover; }}
-                onMouseLeave={e=>{ if(!active) e.currentTarget.style.background="transparent"; }}>
-                <span>{t.label}</span>
-                <span style={{display:"flex",gap:3}}>
-                  <span style={{width:13,height:13,borderRadius:3,background:t.colors.bg,border:`1px solid ${t.colors.borderLight}`}}/>
-                  <span style={{width:13,height:13,borderRadius:3,background:t.colors.accent}}/>
-                  <span style={{width:13,height:13,borderRadius:3,background:t.colors.surface,border:`1px solid ${t.colors.borderLight}`}}/>
-                </span>
-              </button>
-            );
-          })}
+        <div style={{position:"absolute",...pos,background:C.surface,border:`1px solid ${C.border}`,borderRadius:10,boxShadow:"0 12px 32px rgba(0,0,0,0.35)",zIndex:700,overflow:"hidden"}}>
+          <div style={{padding:"9px 12px",fontSize:12,fontWeight:700,color:C.text,borderBottom:`1px solid ${C.border}`}}>Оформление</div>
+          <AppearancePicker/>
         </div>
       )}
     </div>
@@ -177,17 +372,17 @@ export const TRANSFERS=[];
 
 
 // ─── UI КОМПОНЕНТЫ ────────────────────────────────────────────────────────────
-export const Card=({children,style})=><div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:8,...style}}>{children}</div>;
+export const Card=({children,style})=><div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:C.radius||8,boxShadow:C.shadow||"none",...style}}>{children}</div>;
 export const Btn=({children,primary,small,danger,onClick,disabled})=>{
   const busy=!!disabled;
   // Светлая тема: opacity 0.5 растворяет белую надпись в фоне страницы.
   // Оставляем плотный accentDim и тёмный onAccentDim. Тёмные темы не меняются.
   const lightPrimary=busy&&!!primary&&C.scheme==="light";
-  return <button type="button" onClick={onClick} disabled={disabled} style={{padding:small?"5px 12px":"8px 16px",background:primary?(lightPrimary?C.accentDim:C.accent):danger?C.redDim:"transparent",color:primary?(lightPrimary?C.onAccentDim:"#fff"):danger?C.redText:C.text,border:primary?"none":danger?`1px solid ${C.red}`:`1px solid ${C.borderLight}`,borderRadius:6,cursor:busy?"not-allowed":"pointer",fontSize:small?12:13,fontWeight:600,whiteSpace:"nowrap",opacity:busy&&!lightPrimary?0.5:1}}>{children}</button>;
+  return <button type="button" onClick={onClick} disabled={disabled} style={{padding:small?"5px 12px":"8px 16px",background:primary?(lightPrimary?C.accentDim:C.accent):danger?C.redDim:(C.btnBg||"transparent"),color:primary?(lightPrimary?C.onAccentDim:"#fff"):danger?C.redText:C.text,border:primary?"none":danger?`1px solid ${C.red}`:`1px solid ${C.borderLight}`,borderRadius:C.radiusSm||6,cursor:busy?"not-allowed":"pointer",fontSize:small?12:13,fontWeight:600,whiteSpace:"nowrap",opacity:busy&&!lightPrimary?0.5:1,boxShadow:primary&&!busy?(C.btnShadow||"none"):"none",fontFamily:C.inheritFont?"inherit":undefined}}>{children}</button>;
 };
 export const Lbl=({children,req})=><label style={{color:C.textMuted,fontSize:11,display:"block",marginBottom:5,textTransform:"uppercase",letterSpacing:"0.05em"}}>{children}{req&&<span style={{color:C.redText}}> *</span>}</label>;
-export const Inp=({value,onChange,placeholder,type})=><input type={type||"text"} value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{width:"100%",background:C.bg,border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,padding:"8px 12px",fontSize:13,outline:"none"}}/>;
-export const Sel=({value,onChange,options,ph})=><select value={value||""} onChange={e=>onChange(e.target.value)} style={{width:"100%",background:C.bg,border:`1px solid ${C.borderLight}`,color:value?C.text:C.textMuted,borderRadius:6,padding:"8px 12px",fontSize:13,outline:"none"}}>{ph&&<option value="">{ph}</option>}{options.map(o=><option key={o.v||o} value={o.v||o}>{o.l||o}</option>)}</select>;
+export const Inp=({value,onChange,placeholder,type})=><input type={type||"text"} value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{width:"100%",background:C.ctrlBg||C.bg,border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:C.radiusSm||6,padding:"8px 12px",fontSize:13,outline:"none",fontFamily:C.inheritFont?"inherit":undefined}}/>;
+export const Sel=({value,onChange,options,ph})=><select value={value||""} onChange={e=>onChange(e.target.value)} style={{width:"100%",background:C.ctrlBg||C.bg,border:`1px solid ${C.borderLight}`,color:value?C.text:C.textMuted,borderRadius:C.radiusSm||6,padding:"8px 12px",fontSize:13,outline:"none",fontFamily:C.inheritFont?"inherit":undefined}}>{ph&&<option value="">{ph}</option>}{options.map(o=><option key={o.v||o} value={o.v||o}>{o.l||o}</option>)}</select>;
 export const Toggle=({value,onChange,label})=><div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>onChange(!value)}><div style={{width:38,height:21,borderRadius:11,background:value?C.green:C.border,position:"relative",transition:"background 0.2s"}}><div style={{width:17,height:17,borderRadius:"50%",background:"#fff",position:"absolute",top:2,left:value?19:2,transition:"left 0.2s"}}/></div><span style={{color:C.textMuted,fontSize:13}}>{label}</span></div>;
 
 export function StatusBadge({status}){
@@ -556,5 +751,8 @@ function renderCell(col,row,roles,cpCategories){
 }
 
 export const WO_REASONS={damage:"Порча",expiry:"Истёк срок",loss:"Недостача",other:"Прочее"};
-export const WO_REASON_COLORS={damage:[C.red,C.redDim],expiry:[C.yellow,C.yellowDim],loss:[C.purple,C.purpleDim],other:[C.textMuted,C.border]};export const INIT_WRITE_OFFS=[];
+// Цвета берутся из активной палитры и пересчитываются при смене оформления.
+const _woColors=()=>({damage:[C.red,C.redDim],expiry:[C.yellow,C.yellowDim],loss:[C.purple,C.purpleDim],other:[C.textMuted,C.border]});
+export let WO_REASON_COLORS=_woColors(); onAppearanceChange(()=>{ WO_REASON_COLORS=_woColors(); });
+export const INIT_WRITE_OFFS=[];
 export const INIT_RETURNS=[];

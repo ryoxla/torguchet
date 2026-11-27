@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, fmt, fmtDate, api, Card, ConfirmDialog, SearchSelect, useIsMobile } from "../utils/globals";
+import { C, fmt, fmtDate, api, Card, ConfirmDialog, SearchSelect, useIsMobile, onAppearanceChange } from "../utils/globals";
 
 /* ─── helpers ─── */
 const saldoColor = s => s < 0 ? C.greenText : s > 0 ? C.redText : C.textMuted;
@@ -7,7 +7,7 @@ const saldoText  = (s, cur) => s < 0 ? fmt(Math.round(Math.abs(s))) + " " + cur 
 const balColor   = b => b > 0 ? C.greenText : b < 0 ? C.redText : C.textMuted;
 const balText    = (b, cur) => b > 0 ? fmt(Math.round(b)) + " " + cur : b < 0 ? "-" + fmt(Math.round(Math.abs(b))) + " " + cur : "0";
 
-const TYPE_CFG = {
+const _mk_TYPE_CFG=()=>({
   sale:        { label: "Продажа",      color: C.accentText },
   purchase:    { label: "Закупка",      color: C.tealText   },
   "payment-in":  { label: "Платёж вх.", color: C.greenText  },
@@ -15,7 +15,8 @@ const TYPE_CFG = {
   return:      { label: "Возврат",      color: C.yellowText },
   overhead:      { label: "Накл. расход",  color: C.purpleText },
   debt_writeoff: { label: "Списание долга", color: C.yellowText },
-};
+});
+let TYPE_CFG=_mk_TYPE_CFG(); onAppearanceChange(()=>{ TYPE_CFG=_mk_TYPE_CFG(); });
 
 /* ════════════════════════════════════════════
    МОБИЛЬНАЯ КАРТОЧКА КОНТРАГЕНТА в списке

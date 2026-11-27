@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, fmt, api, Btn, DateFilter, inDateRange } from "../utils/globals";
+import { C, fmt, api, Btn, DateFilter, inDateRange, onAppearanceChange } from "../utils/globals";
 
 const TABLE_LABELS = {
   orders_sale:     "Расход",
@@ -11,8 +11,10 @@ const TABLE_LABELS = {
 };
 
 const ACTION_LABELS = { INSERT:"Создан", UPDATE:"Изменён", DELETE:"Удалён" };
-const ACTION_COLORS = { INSERT:C.greenText, UPDATE:C.accentText, DELETE:C.redText };
-const ACTION_BG     = { INSERT:C.greenDim,  UPDATE:C.accentDim,  DELETE:C.redDim  };
+const _mk_ACTION_COLORS=()=>({ INSERT:C.greenText, UPDATE:C.accentText, DELETE:C.redText });
+let ACTION_COLORS=_mk_ACTION_COLORS(); onAppearanceChange(()=>{ ACTION_COLORS=_mk_ACTION_COLORS(); });
+const _mk_ACTION_BG=()=>({ INSERT:C.greenDim,  UPDATE:C.accentDim,  DELETE:C.redDim  });
+let ACTION_BG=_mk_ACTION_BG(); onAppearanceChange(()=>{ ACTION_BG=_mk_ACTION_BG(); });
 const ACTION_ICONS  = { INSERT:"✚", UPDATE:"✎", DELETE:"✕" };
 
 function DiffBlock({ action, old_data, new_data }) {
