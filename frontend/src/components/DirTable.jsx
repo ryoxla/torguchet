@@ -11,6 +11,10 @@ import { C, fmt, fmtDate, uniq, api, APP_CONFIG, NAV, ROLE_PERMISSIONS, canAcces
 import UserModal from "./UserModal";
 import ProductCard from "./ProductCard";
 import Products from "./Products";
+import ImportExcel, { downloadTemplate } from "./ImportExcel";
+
+// Справочники, которые можно загрузить из Excel
+const IMPORT_KINDS=new Set(["counterparties","grades","products"]);
 
 const _mk_DIR_CFG=()=>({
   warehouses:{
@@ -263,8 +267,20 @@ function renderCell(col,row,roles,cpCategories){
 }
 
 
-function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,cpCategories,units,countries,grades=[],currencies=[],legalEntities=[],currentUser}){
+function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,cpCategories,units,countries,grades=[],currencies=[],legalEntities=[],currentUser,onImported}){
   const cfg=DIR_CFG[configKey];
+  const [importOpen,setImportOpen]=useState(false);
+  const [tplBusy,setTplBusy]=useState(false);
+  // Импорт — для тех же пользователей, что могут добавлять записи (раздел «Справочники» не «только просмотр»)
+  const canImport=IMPORT_KINDS.has(configKey)&&(()=>{
+    let all={};try{all=JSON.parse(localStorage.getItem("user_perms")||"{}")||{};}catch{all={};}
+    return canAccess(currentUser,"directories",(currentUser&&all[currentUser.id])||{})===true;
+  })();
+  const getTemplate=()=>{setTplBusy(true);downloadTemplate(configKey).catch(e=>alert("Не удалось скачать шаблон: "+e.message)).finally(()=>setTplBusy(false));};
+  const importButtons=canImport&&<>
+    <Btn onClick={getTemplate} disabled={tplBusy}>{tplBusy?"Готовлю…":"⤓ Скачать шаблон"}</Btn>
+    <Btn onClick={()=>setImportOpen(true)}>⇪ Импорт из Excel</Btn>
+  </>;
   const [search,setSearch]=useState("");
   const [modal,setModal]=useState(null);
   const [confirm,setConfirm]=useState(null);
@@ -398,7 +414,7 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
   return(
     <div style={{display:"flex",justifyContent:"center",padding:"28px 24px"}}>
     <div style={{width:"fit-content",maxWidth:"100%",minWidth:480}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,marginBottom:24}}>
         <div style={{display:"flex",alignItems:"center",gap:14}}>
           <div style={{width:44,height:44,borderRadius:10,background:cfg.colorDim,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:cfg.color}}>{cfg.icon}</div>
           <div><h1 style={{margin:0,color:C.text,fontSize:22,fontWeight:700}}>{cfg.title}</h1><div style={{color:C.textMuted,fontSize:13,marginTop:2}}>{cfg.desc} · {data.length} записей</div></div>
@@ -407,8 +423,9 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
             <Btn primary onClick={()=>setModal({type:"add",row:emptyRow})}>+ Добавить</Btn>
           </div>}
         </div>
-        {configKey!=="cp_categories"&&<div style={{display:"flex",gap:8}}>
+        {configKey!=="cp_categories"&&<div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end"}} data-dir-actions={configKey}>
           <button onClick={onBack} style={{padding:"8px 16px",background:"transparent",border:`1px solid ${C.borderLight}`,color:C.text,borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600}}>← Назад</button>
+          {importButtons}
           {!(configKey==="users" && !(currentUser?.master_role==="superadmin" || (APP_CONFIG.mode==="single" && currentUser?.master_role==="admin"))) && (
             <Btn primary onClick={()=>setModal({type:"add",row:configKey==="counterparties"?{...emptyRow,currency_id:currencies.find(c=>c.code==="RUB")?.id||1}:emptyRow})}>+ Добавить</Btn>
           )}
@@ -447,6 +464,7 @@ function DirTable({configKey,data,setData,onBack,roles,categories,onAddCategory,
         ?<UserModal data={modal.row} onSave={handleSave} onClose={()=>setModal(null)} isNew={modal.type==="add"} roles={roles}/>
         :<DirModal legalEntities={legalEntities} title={cfg.title} fields={cfg.fields} data={modal.row} onSave={handleSave} onClose={()=>setModal(null)} isNew={modal.type==="add"} cpCategories={cpCategories} currencies={currencies} isCounterparty={configKey==="counterparties"}/>
       )}
+      {importOpen&&<ImportExcel kind={configKey} title={cfg.title} onClose={()=>setImportOpen(false)} onImported={res=>onImported&&onImported(configKey,res)}/>}
       {confirm&&<ConfirmDialog text={`Удалить «${confirm.name}»? Это действие нельзя отменить.`} onConfirm={()=>{
   const ep={products:"/products",counterparties:"/counterparties",warehouses:"/warehouses",
     countries:"/countries",units:"/units",grades:"/grades",currencies:"/currencies",

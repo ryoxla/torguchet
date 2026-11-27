@@ -242,7 +242,7 @@ function App(){
     currencies,setCurrencies,articles,setArticles,accounts,setAccounts,
     warehouses,setWarehouses,roles,setRoles,users,setUsers,
     products,setProducts,
-    categories,onAddCategory:handleAddCategory,
+    categories,setCategories,onAddCategory:handleAddCategory,
     legalEntities,setLegalEntities,
     currentUser,
   };

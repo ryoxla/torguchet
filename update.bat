@@ -50,9 +50,10 @@ if exist "%TMPD%\TorgUchet\server.js" set "SRC=%TMPD%\TorgUchet"
 if not exist "%SRC%\server.js" ( echo В архиве нет server.js - это не обновление ТоргУчёт. & pause & exit /b 1 )
 
 echo [4/5] Заменяю файлы программы (настройки .env и данные не трогаю)...
-robocopy "%SRC%" "%APP%" /E /XD node_modules backup public /XF .env .auth_secret schema_company.sql >nul
+rem /IS /IT: копировать и файлы с тем же размером и датой (robocopy по умолчанию их пропускает, а содержимое может отличаться)
+robocopy "%SRC%" "%APP%" /E /IS /IT /XD node_modules backup public /XF .env .auth_secret schema_company.sql >nul
 if errorlevel 8 ( echo Ошибка копирования файлов. Выполните rollback.bat & pause & exit /b 1 )
-if exist "%SRC%\public" robocopy "%SRC%\public" "%APP%\public" /MIR >nul
+if exist "%SRC%\public" robocopy "%SRC%\public" "%APP%\public" /MIR /IS /IT >nul
 if errorlevel 8 ( echo Ошибка копирования интерфейса. Выполните rollback.bat & pause & exit /b 1 )
 rmdir /s /q "%TMPD%"
 
